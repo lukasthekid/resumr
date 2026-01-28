@@ -1,0 +1,142 @@
+# Next.js + TypeScript + PostgreSQL/pgvector Project Rules
+
+## Tech Stack
+- **Framework**: Next.js 15+ (App Router)
+- **Language**: TypeScript (strict mode)
+- **Database**: PostgreSQL 18 with pgvector extension
+- **ORM**: Drizzle ORM
+- **Styling**: Tailwind CSS
+- **AI/RAG**: OpenAI API, pgvector for embeddings
+- **Integration**: n8n webhooks
+
+## Code Style & Best Practices
+
+### TypeScript
+- Use strict TypeScript configuration
+- Prefer interfaces over types for object shapes
+- Always define return types for functions
+- Use const assertions where appropriate
+- Avoid `any` - use `unknown` if type is truly unknown
+- Use proper type guards and narrowing
+
+### Next.js App Router
+- Use Server Components by default
+- Add 'use client' only when necessary (interactivity, hooks, browser APIs)
+- Prefer Server Actions over API routes for mutations
+- Use API routes only for webhooks or external integrations
+- Implement proper loading.tsx and error.tsx files
+- Use metadata API for SEO
+
+### Component Patterns
+- Keep components small and focused (single responsibility)
+- Extract reusable logic into custom hooks
+- Use composition over prop drilling
+- Prefer named exports for components
+- Co-locate component-specific types
+
+### Error Handling
+- Use try-catch blocks for async operations
+- Return typed error objects, not throw in Server Actions
+- Log errors with context (user ID, operation, timestamp)
+- Show user-friendly error messages in UI
+- Handle database connection failures gracefully
+
+### Environment Variables
+- Use `.env.local` for local development
+- Prefix client-side vars with `NEXT_PUBLIC_`
+- Validate env vars at runtime using Zod
+- Never commit secrets to version control
+- Document all required env vars in `.env.example`
+
+### API Design
+- Use RESTful conventions for API routes
+- Validate request bodies with Zod
+- Return consistent response shapes: `{ data?, error?, message? }`
+- Implement rate limiting for public endpoints
+- Use proper HTTP status codes
+
+### Security
+- Sanitize user inputs
+- Use parameterized queries (Drizzle handles this)
+- Implement CSRF protection for forms
+- Validate file uploads (type, size)
+- Rate limit API endpoints
+- Never expose database credentials in client code
+
+### Performance
+- Use React.memo() sparingly (only when necessary)
+- Implement proper pagination for large datasets
+- Use streaming for large API responses
+- Optimize images with next/image
+- Lazy load heavy components
+- Cache database queries when appropriate
+
+### n8n Webhook Integration
+- Validate webhook signatures
+- Use proper TypeScript types for webhook payloads
+- Handle webhook failures with retries
+- Log all webhook events
+- Return 200 OK quickly, process asynchronously if needed
+
+### Testing Strategy
+- Write unit tests for utility functions
+- Test database queries with realistic data
+- Mock external APIs (OpenAI, n8n)
+- Test error scenarios
+- Use Playwright for E2E tests
+
+### Git Workflow
+- Write clear, descriptive commit messages
+- Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`
+- Keep commits atomic (one logical change per commit)
+- Review your own PRs before requesting review
+
+## Code Review Checklist
+- [ ] TypeScript errors resolved
+- [ ] Proper error handling implemented
+- [ ] Environment variables used correctly
+- [ ] Database queries optimized
+- [ ] Components properly typed
+- [ ] No console.logs in production code
+- [ ] Responsive design implemented
+- [ ] Loading states handled
+- [ ] Error states handled
+- [ ] Security best practices followed
+
+## Performance Checklist
+- [ ] Images optimized with next/image
+- [ ] Database queries indexed
+- [ ] Unnecessary re-renders eliminated
+- [ ] Large lists paginated
+- [ ] API responses cached when appropriate
+- [ ] Vector search queries optimized
+
+## When to Ask for Help
+- Complex database migrations
+- Performance optimization issues
+- Security concerns
+- Architecture decisions
+- Third-party integration challenges
+
+## Naming Conventions
+- **Files**: kebab-case (`user-profile.tsx`)
+- **Components**: PascalCase (`UserProfile`)
+- **Functions**: camelCase (`getUserData`)
+- **Constants**: UPPER_SNAKE_CASE (`API_BASE_URL`)
+- **Database tables**: snake_case (`user_profiles`)
+- **Types/Interfaces**: PascalCase (`UserProfile`)
+
+## Comments & Documentation
+- Write self-documenting code (clear names over comments)
+- Document complex algorithms or business logic
+- Add JSDoc for public API functions
+- Explain "why" not "what" in comments
+- Keep comments up to date with code changes
+
+## AI Assistant Usage
+- Use for boilerplate generation
+- Ask for code review and suggestions
+- Request explanation of complex patterns
+- Get help with type definitions
+- Debugging assistance
+- Architecture recommendations
