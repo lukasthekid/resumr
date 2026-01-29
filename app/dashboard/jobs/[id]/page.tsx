@@ -1,16 +1,17 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ExpandableJobDescription } from "../_components/ExpandableJobDescription";
-import { CoverLetterGenerator } from "../_components/CoverLetterGenerator";
 import { JobApplicationTracker } from "../_components/JobApplicationTracker";
+import { JobDetailsClient } from "./_components/JobDetailsClient";
+import { ExternalLink, Building2 } from "lucide-react";
 
 export default async function JobDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
   const { id } = await params;
   const jobId = Number(id);
   if (!Number.isFinite(jobId)) notFound();
@@ -27,86 +28,110 @@ export default async function JobDetailPage({
     (v: unknown): v is string => typeof v === "string" && v.trim().length > 0
   );
 
+  // Format posted date (for now, use created date)
+  const postedDate = new Date(job.createdAt);
+  const daysAgo = Math.floor(
+    (Date.now() - postedDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const postedText =
+    daysAgo === 0
+      ? "Today"
+      : daysAgo === 1
+      ? "1 day ago"
+      : `${daysAgo} days ago`;
+
   return (
-    <div className="max-w-3xl space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <Link
-          href="/dashboard"
-          className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
-        >
-          ← Back to dashboard
-        </Link>
-        {job.url && (
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-sky-600 hover:text-sky-700 transition-colors"
-          >
-            Open original posting
-          </a>
-        )}
-      </div>
-
-      <header className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 space-y-4">
-        <div className="flex items-start gap-4">
-          {job.companyLogo ? (
-            // Use <img> (not next/image) to avoid domain allowlist config.
-            <img
-              src={job.companyLogo}
-              alt={job.companyName ? `${job.companyName} logo` : "Company logo"}
-              className="h-12 w-12 rounded-xl border border-slate-200 bg-slate-50 object-contain"
-            />
-          ) : (
-            <div className="h-12 w-12 rounded-xl border border-slate-200 bg-slate-50" />
-          )}
-
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-              {job.jobTitle || "Job listing"}
-            </h1>
-            <div className="mt-1 text-sm text-slate-600">
-              <span className="text-slate-800 font-medium">
-                {job.companyName || "Unknown company"}
-              </span>
-              {locationParts.length > 0 && (
-                <>
-                  {" "}
-                  · <span>{locationParts.join(", ")}</span>
-                </>
+    <div className="min-h-screen">
+      {/* Job Header - Full Width */}
+      <header className="bg-surface border-b border-border mb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-start justify-between gap-6">
+            {/* Left Side - Logo & Info */}
+            <div className="flex items-start gap-4 flex-1 min-w-0">
+              {/* Company Logo */}
+              {job.companyLogo ? (
+                <img
+                  src={job.companyLogo}
+                  alt={job.companyName ? `${job.companyName} logo` : "Company logo"}
+                  className="h-16 w-16 rounded-xl border border-border bg-slate-50 object-contain flex-shrink-0"
+                />
+              ) : (
+                <div className="h-16 w-16 rounded-xl border border-border bg-slate-50 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="h-8 w-8 text-foreground-subtle" />
+                </div>
               )}
-              {typeof job.numberOfApplicants === "number" && (
-                <>
-                  {" "}
-                  ·{" "}
-                  <span>
-                    {job.numberOfApplicants.toLocaleString()} applicant
-                    {job.numberOfApplicants === 1 ? "" : "s"}
+
+              {/* Job Info */}
+              <div className="min-w-0 flex-1">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+                  {job.jobTitle || "Job listing"}
+                </h1>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-foreground-muted">
+                  <span className="font-semibold text-foreground">
+                    {job.companyName || "Unknown company"}
                   </span>
-                </>
+                  {locationParts.length > 0 && (
+                    <>
+                      <span className="text-foreground-subtle">•</span>
+                      <span>{locationParts.join(", ")}</span>
+                    </>
+                  )}
+                  <span className="text-foreground-subtle">•</span>
+                  <span>{postedText}</span>
+                  {typeof job.numberOfApplicants === "number" && job.numberOfApplicants > 0 && (
+                    <>
+                      <span className="text-foreground-subtle">•</span>
+                      <span>
+                        {job.numberOfApplicants.toLocaleString()} applicant
+                        {job.numberOfApplicants === 1 ? "" : "s"}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Actions */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {/* Status Tracker */}
+              <div className="hidden sm:block">
+                <JobApplicationTracker jobId={job.id} />
+              </div>
+
+              {/* Link Button */}
+              {job.url && !job.url.startsWith("manual://") && (
+                <a
+                  href={job.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-100 hover:bg-slate-200 px-4 py-2.5 text-sm font-medium text-foreground transition-colors"
+                  title="Open original posting"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span className="hidden md:inline">View Original</span>
+                </a>
               )}
             </div>
           </div>
-        </div>
 
-        <div className="border-t border-slate-200 pt-4">
-          <JobApplicationTracker jobId={job.id} />
+          {/* Mobile Status Tracker */}
+          <div className="sm:hidden mt-4 pt-4 border-t border-border">
+            <JobApplicationTracker jobId={job.id} />
+          </div>
         </div>
       </header>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-        <h2 className="text-base font-semibold text-slate-900">Job description</h2>
-        <div className="mt-3 text-sm text-slate-700">
-          <ExpandableJobDescription text={job.jobDescription ?? ""} />
-        </div>
-      </section>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="max-w-5xl mx-auto">
+          {/* Application Studio & Job Description */}
+          <JobDetailsClient 
+            jobId={job.id}
+            jobDescription={job.jobDescription ?? ""}
+          />
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-        <h2 className="text-base font-semibold text-slate-900">Cover letter</h2>
-        <div className="mt-4">
-          <CoverLetterGenerator jobId={job.id} />
         </div>
-      </section>
+      </div>
     </div>
   );
 }

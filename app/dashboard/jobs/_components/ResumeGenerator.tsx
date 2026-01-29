@@ -19,13 +19,13 @@ type GenerateResponse = {
   ok?: boolean;
   error?: string;
   webhookStatus?: number;
-  coverLetter?: string | null;
+  resumeData?: any;
   job?: any;
   user?: any;
   webhookResponse?: unknown;
 };
 
-export function CoverLetterGenerator({ jobId }: { jobId: number }) {
+export function ResumeGenerator({ jobId }: { jobId: number }) {
   const router = useRouter();
   const [language, setLanguage] = useState<(typeof COMMON_LANGUAGES)[number]>(
     "English"
@@ -42,7 +42,7 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
     setSubmitting(true);
     setResult(null);
     try {
-      const res = await fetch("/api/cover-letter/generate", {
+      const res = await fetch("/api/resume/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -54,34 +54,30 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
 
       const json = (await res.json().catch(() => null)) as GenerateResponse | null;
 
-      console.log("Generator response:", { 
+      console.log("Resume generator response:", { 
         statusOk: res.ok, 
         jsonOk: json?.ok, 
-        hasCoverLetter: !!json?.coverLetter,
+        hasResumeData: !!json?.resumeData,
         hasJob: !!json?.job,
         hasUser: !!json?.user,
         fullResponse: json
       });
 
-      if (res.ok && json?.ok && json.coverLetter) {
+      if (res.ok && json?.ok && json.resumeData) {
         const dataToStore = {
           job: json.job,
           user: json.user,
-          coverLetterBody: json.coverLetter,
+          resumeData: json.resumeData,
         };
         
-        console.log("Storing cover letter data:", dataToStore);
+        console.log("Storing resume data:", dataToStore);
         sessionStorage.setItem(
-          `coverLetter_${jobId}`,
+          `resume_${jobId}`,
           JSON.stringify(dataToStore)
         );
         
-        // Verify it was stored
-        const stored = sessionStorage.getItem(`coverLetter_${jobId}`);
-        console.log("Verification - data stored:", stored ? "yes" : "no");
-        
-        console.log("Navigating to:", `/dashboard/jobs/${jobId}/cover-letter`);
-        router.push(`/dashboard/jobs/${jobId}/cover-letter`);
+        console.log("Navigating to:", `/dashboard/jobs/${jobId}/resume`);
+        router.push(`/dashboard/jobs/${jobId}/resume`);
         return;
       }
 
@@ -114,7 +110,7 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
             onChange={(e) =>
               setLanguage(e.target.value as (typeof COMMON_LANGUAGES)[number])
             }
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-transparent"
           >
             {COMMON_LANGUAGES.map((l) => (
               <option key={l} value={l}>
@@ -123,7 +119,7 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
             ))}
           </select>
           <p className="text-xs text-slate-500">
-            Choose the language you want the letter written in.
+            Choose the language you want the resume written in.
           </p>
         </div>
 
@@ -135,11 +131,11 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={4}
-            placeholder="e.g. Make it more personal, mention my X project, keep it under 200 words…"
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-transparent"
+            placeholder="e.g. Emphasize leadership skills, highlight AWS experience, keep it one page…"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-transparent"
           />
           <p className="text-xs text-slate-500">
-            Optional. Add style, tone, or project highlights.
+            Optional. Add focus areas, skills to highlight, or formatting preferences.
           </p>
         </div>
       </div>
@@ -181,4 +177,3 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
     </div>
   );
 }
-

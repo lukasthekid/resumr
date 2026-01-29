@@ -3,13 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import {
+  LayoutDashboard,
+  Briefcase,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
 function NavLink({
   href,
   children,
+  icon: Icon,
 }: {
   href: string;
   children: React.ReactNode;
+  icon: React.ComponentType<{ className?: string }>;
 }) {
   const pathname = usePathname();
   const active = pathname === href;
@@ -18,50 +26,86 @@ function NavLink({
     <Link
       href={href}
       className={[
-        "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200",
         active
-          ? "bg-sky-50 text-sky-600 ring-1 ring-sky-200"
-          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+          ? "bg-primary text-white shadow-sm"
+          : "text-foreground-muted hover:bg-slate-50 hover:text-foreground",
       ].join(" ")}
     >
+      <Icon className="h-4 w-4" />
       {children}
     </Link>
   );
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  userEmail: string;
+  userName: string;
+}
+
+export function Sidebar({ userEmail, userName }: SidebarProps) {
+  const userInitials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
-    <aside className="w-[280px] shrink-0 border-r border-slate-200 bg-white">
-      <div className="h-full px-4 py-5 flex flex-col">
-        <div className="px-2">
-          <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl bg-sky-500 flex items-center justify-center shadow-sm">
-              <div className="h-3.5 w-3.5 rounded bg-white" />
+    <aside className="w-64 shrink-0 border-r border-border bg-surface">
+      <div className="h-full px-4 py-6 flex flex-col">
+        {/* Logo */}
+        <div className="px-2 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
+              <div className="h-4 w-4 rounded bg-white" />
             </div>
             <div>
-              <div className="text-sm font-semibold tracking-tight text-slate-900">
+              <div className="text-base font-bold tracking-tight text-foreground">
                 resumr
               </div>
-              <div className="text-xs text-slate-500">
-                AI resumes & cover letters
+              <div className="text-xs text-foreground-subtle">
+                AI-Powered Career Tools
               </div>
             </div>
           </div>
         </div>
 
-        <nav className="mt-8 flex flex-col gap-1">
-          <NavLink href="/dashboard">Dashboard</NavLink>
-          <NavLink href="/dashboard/applications">Applications</NavLink>
-          <NavLink href="/dashboard/documents">Documents</NavLink>
-          <NavLink href="/dashboard/settings">Settings</NavLink>
+        {/* Navigation */}
+        <nav className="flex flex-col gap-1.5">
+          <NavLink href="/dashboard" icon={LayoutDashboard}>
+            Dashboard
+          </NavLink>
+          <NavLink href="/dashboard/applications" icon={Briefcase}>
+            Applications
+          </NavLink>
+          <NavLink href="/dashboard/settings" icon={Settings}>
+            Settings
+          </NavLink>
         </nav>
 
-        <div className="mt-auto pt-4">
+        {/* User Profile - Bottom */}
+        <div className="mt-auto pt-6 border-t border-border">
+          <div className="flex items-center gap-3 px-2 mb-3">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-secondary to-secondary-hover flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+              {userInitials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-foreground truncate">
+                {userName}
+              </div>
+              <div className="text-xs text-foreground-muted truncate">
+                {userEmail}
+              </div>
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="w-full flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground-muted hover:bg-slate-50 hover:text-foreground transition-all duration-200"
           >
+            <LogOut className="h-4 w-4" />
             Logout
           </button>
         </div>

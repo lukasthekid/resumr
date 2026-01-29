@@ -1,15 +1,60 @@
 @import "tailwindcss";
 
 :root {
+  /* Background - Very light gray/blue tint (slate-50) */
   --background: #f8fafc;
+  
+  /* Primary - Deep indigo for buttons and active states */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #6366f1;
+  
+  /* Secondary - Teal accent for success states and AI features */
+  --secondary: #14b8a6;
+  --secondary-hover: #0d9488;
+  --secondary-light: #2dd4bf;
+  
+  /* Surface - Pure white for cards */
+  --surface: #ffffff;
+  
+  /* Text colors */
   --foreground: #0f172a;
+  --foreground-muted: #64748b;
+  --foreground-subtle: #94a3b8;
+  
+  /* Border colors */
+  --border: #e2e8f0;
+  --border-hover: #cbd5e1;
 }
 
 @theme inline {
+  /* Background colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
-    "Noto Sans", "Liberation Sans", sans-serif;
+  
+  /* Primary color palette */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  
+  /* Secondary color palette */
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-light: var(--secondary-light);
+  
+  /* Surface */
+  --color-surface: var(--surface);
+  
+  /* Text colors */
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  
+  /* Border colors */
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  
+  /* Font families - Inter for premium look */
+  --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
 }
@@ -17,5 +62,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

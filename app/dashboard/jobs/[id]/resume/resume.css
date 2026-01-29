@@ -1,0 +1,125 @@
+/* Resume Editing Styles */
+
+/* Editable text styling */
+.editable-text {
+  cursor: text;
+  outline: none;
+  transition: background-color 0.2s;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: 3px;
+}
+
+.editable-text:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+.editable-text:focus {
+  background-color: rgba(99, 102, 241, 0.1);
+  outline: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Preserve formatting in contentEditable */
+.editable-text * {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* Support for bold, italic, underline */
+.editable-text strong,
+.editable-text b {
+  font-weight: 600;
+}
+
+.editable-text em,
+.editable-text i {
+  font-style: italic;
+}
+
+.editable-text u {
+  text-decoration: underline;
+}
+
+/* Skills section styling */
+.skills-section strong {
+  font-weight: 600;
+}
+
+.skills-section div {
+  line-height: 1.5;
+}
+
+/* Print styles for resume */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Reset everything */
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the resume document and its children */
+  #resume-document,
+  #resume-document * {
+    visibility: visible;
+  }
+
+  /* Position the document to fill the page */
+  #resume-document {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    max-width: 210mm;
+    min-height: 297mm;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Preserve colors and backgrounds */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Ensure content fits on one page */
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: white;
+  }
+
+  /* Remove shadows for print */
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-md {
+    box-shadow: none !important;
+  }
+
+  /* Remove editing styles */
+  .editable-text {
+    background-color: transparent !important;
+    outline: none !important;
+    cursor: default !important;
+  }
+
+  /* Ensure text is properly rendered */
+  .editable-text {
+    color: #000 !important;
+  }
+}
