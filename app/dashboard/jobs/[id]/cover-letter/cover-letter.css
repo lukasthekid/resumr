@@ -1,0 +1,184 @@
+/* Cover Letter A4 Styles */
+
+/* Fixed header - not selectable */
+.fixed-header {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Prevent text selection on sidebar in layout */
+.fixed-header * {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Editable body section */
+.editable-body {
+  min-height: 200px;
+  cursor: text;
+}
+
+.editable-body .ProseMirror {
+  font-family: Arial, Calibri, sans-serif;
+  font-size: 11pt;
+  line-height: 1.3;
+  color: #000;
+  outline: none;
+  text-align: left;
+  cursor: text;
+}
+
+.editable-body .ProseMirror > * {
+  margin: 0;
+}
+
+.editable-body .ProseMirror p {
+  margin-bottom: 1em;
+  text-align: left;
+}
+
+.editable-body .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.editable-body .ProseMirror strong {
+  font-weight: 600;
+}
+
+.editable-body .ProseMirror em {
+  font-style: italic;
+}
+
+.editable-body .ProseMirror u {
+  text-decoration: underline;
+}
+
+.editable-body .ProseMirror ul {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+  margin-top: 0;
+  list-style-type: disc;
+  padding-left: 0;
+}
+
+.editable-body .ProseMirror ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+  margin-top: 0;
+  list-style-type: decimal;
+  padding-left: 0;
+}
+
+.editable-body .ProseMirror li {
+  margin-bottom: 0.25em;
+  text-align: left;
+}
+
+.editable-body .ProseMirror li p {
+  margin-bottom: 0.25em;
+}
+
+/* Placeholder */
+.editable-body .ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: "Click here to edit the cover letter body...";
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Ensure cursor is visible */
+.editable-body .ProseMirror:focus {
+  outline: none;
+  cursor: text;
+}
+
+/* Remove any extra spacing */
+.editable-body .ProseMirror h1,
+.editable-body .ProseMirror h2,
+.editable-body .ProseMirror h3 {
+  font-size: 11pt;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  text-align: left;
+}
+
+/* Ensure blockquotes are left-aligned */
+.editable-body .ProseMirror blockquote {
+  border-left: 3px solid #ddd;
+  padding-left: 1em;
+  margin-left: 0;
+  margin-bottom: 1em;
+  color: #555;
+}
+
+/* Print styles for native PDF generation */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Reset everything */
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the cover letter document and its children */
+  #cover-letter-document,
+  #cover-letter-document * {
+    visibility: visible;
+  }
+
+  /* Position the document to fill the page */
+  #cover-letter-document {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    max-width: 210mm;
+    min-height: 297mm;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Preserve colors and backgrounds */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Ensure content fits on one page */
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: white;
+  }
+
+  /* Remove shadows for print */
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-md {
+    box-shadow: none !important;
+  }
+
+  /* Page breaks */
+  .editable-body {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure text is properly rendered */
+  .editable-body .ProseMirror {
+    color: #000 !important;
+  }
+}
