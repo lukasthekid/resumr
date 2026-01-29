@@ -81,7 +81,6 @@ jobs:
             docker load < resumr-image.tar.gz && \
             docker compose down || true && \
             docker compose up -d && \
-            docker compose exec -T resumr npx prisma migrate deploy && \
             rm -f resumr-image.tar.gz && \
             echo 'Deployment completed successfully'"
 
