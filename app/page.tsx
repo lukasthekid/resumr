@@ -76,7 +76,7 @@ export default function Home() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
-            Welcome to <span className="text-sky-400">resumr</span>
+            Welcome to <span className="text-sky-400">Resumr</span>
           </h1>
           <p className="text-sm text-slate-300">
             Create an account or log in to get started.

@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "resumr",
-  description: "Sign up or log in to resumr",
+  title: "Resumr",
+  description: "Sign up or log in to Resumr",
 };
 
 export default function RootLayout({

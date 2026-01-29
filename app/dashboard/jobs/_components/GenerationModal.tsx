@@ -1,21 +1,24 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { useEffect } from "react";
 
 interface GenerationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
-  description: string;
+  /** When set, shows the new header: icon + "Customize your {documentType}" + subtext. Otherwise title/description are used. */
+  documentType?: string;
+  title?: string;
+  description?: string;
   children: React.ReactNode;
 }
 
 export function GenerationModal({
   isOpen,
   onClose,
-  title,
-  description,
+  documentType,
+  title = "",
+  description = "",
   children,
 }: GenerationModalProps) {
   // Handle ESC key
@@ -51,21 +54,35 @@ export function GenerationModal({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-start justify-between p-6 border-b border-border">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-              <p className="text-sm text-foreground-muted mt-1">{description}</p>
-            </div>
+          <div className="relative p-6 pb-5">
+            {documentType ? (
+              <div className="flex flex-col items-center text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white">
+                  <Sparkles className="h-7 w-7" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground">
+                  Customize your {documentType}
+                </h2>
+                <p className="mt-1 text-sm text-foreground-muted">
+                  Tailor the output to your specific needs.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">{title}</h2>
+                <p className="text-sm text-foreground-muted mt-1">{description}</p>
+              </div>
+            )}
             <button
               onClick={onClose}
-              className="text-foreground-muted hover:text-foreground transition-colors rounded-lg p-1 hover:bg-slate-100"
+              className="absolute right-4 top-4 text-foreground-muted hover:text-foreground transition-colors rounded-lg p-1 hover:bg-slate-100"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-6">{children}</div>
+          <div className="px-6 pb-6">{children}</div>
         </div>
       </div>
     </div>

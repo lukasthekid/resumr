@@ -25,6 +25,7 @@ export function DragDropUpload() {
   const [existing, setExisting] = useState<string[]>([]);
   const [loadingExisting, setLoadingExisting] = useState(false);
   const [existingError, setExistingError] = useState<string | null>(null);
+  const [deletingFileName, setDeletingFileName] = useState<string | null>(null);
 
   async function refreshExisting() {
     setLoadingExisting(true);
@@ -136,12 +137,35 @@ export function DragDropUpload() {
   };
 
   const handleDelete = async (filename: string) => {
-    const confirmed = window.confirm(`Delete "${filename}"? This cannot be undone.`);
+    const confirmed = window.confirm(
+      `Delete "${filename}"? All document chunks for this file will be removed. This cannot be undone.`
+    );
     if (!confirmed) return;
 
-    // Note: You'll need to implement a delete endpoint for individual files
-    // For now, we'll just use the clear all endpoint
-    window.alert("Individual file deletion not yet implemented. Use the clear all button in the old UI for now.");
+    setDeletingFileName(filename);
+    try {
+      const res = await fetch(
+        `/api/documents/delete?fileName=${encodeURIComponent(filename)}`,
+        { method: "DELETE" }
+      );
+      const json = (await res.json().catch(() => null)) as
+        | { ok?: boolean; error?: string }
+        | null;
+
+      if (!res.ok || !json?.ok) {
+        const msg = json?.error ?? `Delete failed (HTTP ${res.status}).`;
+        setExistingError(msg);
+        return;
+      }
+      setExistingError(null);
+      await refreshExisting();
+    } catch (err) {
+      setExistingError(
+        err instanceof Error ? err.message : "Failed to delete file."
+      );
+    } finally {
+      setDeletingFileName(null);
+    }
   };
 
   return (
@@ -296,7 +320,7 @@ export function DragDropUpload() {
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {existing.map((name, index) => (
               <div
-                key={index}
+                key={`${name}-${index}`}
                 className="flex items-center gap-3 bg-surface rounded-lg p-3 border border-border hover:border-border-hover transition-colors"
               >
                 <FileText className="h-5 w-5 text-secondary flex-shrink-0" />
@@ -306,11 +330,17 @@ export function DragDropUpload() {
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleDelete(name)}
-                  className="text-foreground-muted hover:text-red-600 transition-colors"
+                  disabled={deletingFileName !== null}
+                  className="text-foreground-muted hover:text-red-600 transition-colors disabled:opacity-60"
                   title="Delete file"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {deletingFileName === name ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             ))}

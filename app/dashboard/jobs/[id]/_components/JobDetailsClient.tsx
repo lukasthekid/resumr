@@ -96,8 +96,7 @@ export function JobDetailsClient({ jobId, jobDescription }: JobDetailsClientProp
       <GenerationModal
         isOpen={resumeModalOpen}
         onClose={() => setResumeModalOpen(false)}
-        title="Generate Tailored Resume"
-        description="Customize your resume to match this specific job posting"
+        documentType="Resume"
       >
         <ResumeGenerator jobId={jobId} />
       </GenerationModal>
@@ -106,8 +105,7 @@ export function JobDetailsClient({ jobId, jobDescription }: JobDetailsClientProp
       <GenerationModal
         isOpen={coverLetterModalOpen}
         onClose={() => setCoverLetterModalOpen(false)}
-        title="Generate Cover Letter"
-        description="Create a persuasive cover letter for this application"
+        documentType="Cover Letter"
       >
         <CoverLetterGenerator jobId={jobId} />
       </GenerationModal>
