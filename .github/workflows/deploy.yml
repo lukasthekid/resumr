@@ -1,0 +1,103 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DEPLOY_PATH: /opt/stacks/resumr
+  IMAGE_NAME: resumr
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --tag ${{ env.IMAGE_NAME }}:latest \
+            --tag ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --load \
+            .
+
+      - name: Save Docker image
+        run: |
+          docker save ${{ env.IMAGE_NAME }}:latest | gzip > resumr-image.tar.gz
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory on server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "\
+            mkdir -p ${{ env.DEPLOY_PATH }} && \
+            echo 'Deployment directory ready'"
+
+      - name: Generate .env file on server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "\
+            cat > ${{ env.DEPLOY_PATH }}/.env << 'EOF'
+          # Database Configuration (connects to host PostgreSQL)
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+
+          # Authentication
+          AUTH_URL=${{ secrets.AUTH_URL }}
+          AUTH_SECRET=${{ secrets.AUTH_SECRET }}
+
+          # N8N Integration
+          N8N_API_KEY=${{ secrets.N8N_API_KEY }}
+
+          # Node Environment
+          NODE_ENV=production
+          EOF
+          "
+
+      - name: Copy docker-compose.yml to server
+        run: |
+          scp -i ~/.ssh/id_ed25519 docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ env.DEPLOY_PATH }}/
+
+      - name: Transfer Docker image to server
+        run: |
+          scp -i ~/.ssh/id_ed25519 resumr-image.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ env.DEPLOY_PATH }}/
+
+      - name: Load Docker image and deploy
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "\
+            cd ${{ env.DEPLOY_PATH }} && \
+            docker load < resumr-image.tar.gz && \
+            docker compose down || true && \
+            docker compose up -d && \
+            docker compose exec -T resumr npx prisma migrate deploy && \
+            rm -f resumr-image.tar.gz && \
+            echo 'Deployment completed successfully'"
+
+      - name: Health check
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "\
+            cd ${{ env.DEPLOY_PATH }} && \
+            echo 'Waiting for services to be healthy...' && \
+            sleep 10 && \
+            docker compose ps"
+
+      - name: Cleanup old Docker images
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "\
+            docker image prune -af --filter 'until=72h' || true"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519

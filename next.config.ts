@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     // due to lockfiles higher up the directory tree.
     root: __dirname,
   },
+  output: 'standalone',
 };
 
 export default nextConfig;
