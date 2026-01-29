@@ -72,12 +72,12 @@ export default async function DashboardHome() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-4xl font-bold">10%</div>
+                  <div className="text-4xl font-bold">25%</div>
                   <div className="text-indigo-100 text-sm">Complete</div>
                 </div>
               </div>
               <div className="w-full bg-indigo-400/30 rounded-full h-3 overflow-hidden">
-                <div className="bg-white h-full rounded-full transition-all duration-500" style={{ width: '10%' }} />
+                <div className="bg-white h-full rounded-full transition-all duration-500" style={{ width: '25%' }} />
               </div>
             </div>
 
