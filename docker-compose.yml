@@ -7,9 +7,10 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+      - PORT=${PORT:-3010}
     network_mode: "host"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3010}"]
       interval: 30s
       timeout: 10s
       retries: 3

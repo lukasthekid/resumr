@@ -63,6 +63,9 @@ jobs:
 
           # Node Environment
           NODE_ENV=production
+          
+          # Port Configuration (defaults to 3010)
+          PORT=3010
           EOF
           "
 
