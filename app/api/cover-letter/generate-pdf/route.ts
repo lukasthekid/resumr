@@ -412,7 +412,7 @@ export async function POST(req: NextRequest) {
     const filename = `${job.companyName.replace(/[^a-z0-9]/gi, '_')}_${job.jobTitle.replace(/[^a-z0-9]/gi, '_')}_Cover_Letter.pdf`;
 
     // Return PDF as response
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(Buffer.from(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${filename}"`,
