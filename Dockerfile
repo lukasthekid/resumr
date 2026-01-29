@@ -4,8 +4,11 @@ RUN apk add --no-cache libc6-compat openssl
 
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Copy package files and prisma schema (needed for postinstall hook)
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma
+
+# Install dependencies
 RUN npm ci
 
 # Stage 2: Builder
