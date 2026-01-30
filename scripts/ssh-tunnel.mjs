@@ -8,9 +8,9 @@ import { Client } from "ssh2";
 function stripQuotes(s) {
   if (!s) return s;
   if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
-    return s.slice(1, -1);
+    return s.slice(1, -1).trim();
   }
-  return s;
+  return s.trim();
 }
 
 function expandHome(p) {
@@ -24,7 +24,7 @@ function expandHome(p) {
 
 const SSH_HOST = process.env.SSH_HOST || "5.75.171.23";
 const SSH_PORT = Number(process.env.SSH_PORT || 22);
-const SSH_USERNAME = process.env.SSH_USERNAME;
+const SSH_USERNAME = process.env.SSH_USERNAME?.trim();
 const SSH_KEY_PATH = expandHome(stripQuotes(process.env.SSH_KEY_PATH));
 
 const DB_TUNNEL_PORT = Number(process.env.DB_TUNNEL_PORT || 5433);

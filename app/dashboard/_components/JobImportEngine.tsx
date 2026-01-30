@@ -146,20 +146,8 @@ export function JobImportEngine() {
               className="block w-full rounded-lg border border-border bg-slate-50 px-4 py-3 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
             <p className="text-xs text-foreground-muted">
-              We support job boards from LinkedIn, Indeed, Glassdoor, and more
+              We support job boards from LinkedIn, Indeed, Glassdoor, Stepstone and more
             </p>
-          </div>
-
-          {/* Supported Sites Logos */}
-          <div className="flex items-center gap-4 px-2">
-            <span className="text-xs font-medium text-foreground-subtle">Supported:</span>
-            <div className="flex items-center gap-3 grayscale opacity-60">
-              <span className="text-xs font-semibold text-slate-600">LinkedIn</span>
-              <span className="text-slate-300">•</span>
-              <span className="text-xs font-semibold text-slate-600">Indeed</span>
-              <span className="text-slate-300">•</span>
-              <span className="text-xs font-semibold text-slate-600">Glassdoor</span>
-            </div>
           </div>
         </div>
       ) : (

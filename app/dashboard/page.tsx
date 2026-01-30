@@ -5,7 +5,8 @@ import { ImportJobForm } from "./_components/ImportJobForm";
 import { JobImportEngine } from "./_components/JobImportEngine";
 import { ProfileSnapshot } from "./_components/ProfileSnapshot";
 import Link from "next/link";
-import { Upload, Wand2, Send, CheckCircle2, Lock, FileText } from "lucide-react";
+import { Upload, Wand2, Send, CheckCircle2, Lock, FileText, ArrowRight } from "lucide-react";
+import { ApplicationStatusBadge } from "@/components/ApplicationStatusBadge";
 
 export default async function DashboardHome() {
   const session = await auth();
@@ -250,6 +251,12 @@ export default async function DashboardHome() {
   // Check if user has profile details
   const hasProfile = !!(user?.name && user?.phoneNumber && user?.city);
 
+  const recentApplication = await prisma.jobApplication.findFirst({
+    where: { userId },
+    include: { job: true },
+    orderBy: { updatedAt: "desc" },
+  });
+
   return (
     <div className="space-y-6">
       {/* Two-Column Grid Layout */}
@@ -270,25 +277,129 @@ export default async function DashboardHome() {
 
           {/* Recent Applications - Empty State */}
           <div className="bg-surface rounded-xl shadow-sm border border-border p-8">
-            <div className="mb-4">
-              <h3 className="text-lg font-bold text-foreground">Recent Applications</h3>
-              <p className="text-sm text-foreground-muted mt-1">
-                Track your job applications and generated documents
-              </p>
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Recent Applications</h3>
+                <p className="text-sm text-foreground-muted mt-1">
+                  Track your job applications and generated document
+                </p>
+              </div>
+              <Link
+                href="/dashboard/applications"
+                className="text-sm font-semibold text-primary hover:text-primary-hover transition-colors"
+              >
+                View all
+              </Link>
             </div>
 
-            {/* Empty State */}
-            <div className="rounded-xl border-2 border-dashed border-border bg-slate-50/50 py-12 px-6 text-center">
-              <div className="mx-auto h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <FileText className="h-6 w-6 text-slate-400" />
+            {recentApplication ? (
+              <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-200">
+                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Company
+                        </th>
+                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Role
+                        </th>
+                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Status
+                        </th>
+                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Timeline
+                        </th>
+                        <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {(() => {
+                        const app = recentApplication;
+                        const locationParts = [app.job.locationCity, app.job.country].filter(
+                          (v) => v && String(v).trim().length > 0
+                        );
+                        const locationStr = locationParts.join(", ") || "—";
+
+                        return (
+                          <tr className="bg-white hover:bg-slate-50/80 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                {app.job.companyLogo ? (
+                                  <img
+                                    src={app.job.companyLogo}
+                                    alt=""
+                                    className="h-10 w-10 rounded-lg border border-slate-200 bg-slate-50 object-contain"
+                                  />
+                                ) : (
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400">
+                                    {app.job.companyName?.charAt(0) ?? "?"}
+                                  </div>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-slate-900">
+                                    {app.job.companyName || "Unknown"}
+                                  </p>
+                                  <p className="text-xs text-slate-500 truncate max-w-[180px]">
+                                    {locationStr}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm font-medium text-slate-800">
+                                {app.job.jobTitle || "—"}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <ApplicationStatusBadge status={app.status} />
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-600">
+                              {app.appliedAt
+                                ? `Applied on ${new Date(app.appliedAt).toLocaleDateString(undefined, {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}`
+                                : `Updated on ${new Date(app.updatedAt).toLocaleDateString(undefined, {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}`}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Link
+                                  href={`/dashboard/jobs/${app.job.id}`}
+                                  title="View details"
+                                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition-colors"
+                                >
+                                  <ArrowRight className="h-4 w-4" />
+                                </Link>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <h4 className="text-sm font-semibold text-foreground mb-1">
-                No applications yet
-              </h4>
-              <p className="text-xs text-foreground-muted max-w-sm mx-auto">
-                Import your first job above to start generating tailored resumes and cover letters
-              </p>
-            </div>
+            ) : (
+              <div className="rounded-xl border-2 border-dashed border-border bg-slate-50/50 py-12 px-6 text-center">
+                <div className="mx-auto h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                  <FileText className="h-6 w-6 text-slate-400" />
+                </div>
+                <h4 className="text-sm font-semibold text-foreground mb-1">
+                  No applications yet
+                </h4>
+                <p className="text-xs text-foreground-muted max-w-sm mx-auto">
+                  Import your first job above to start generating tailored resumes and cover letters
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
