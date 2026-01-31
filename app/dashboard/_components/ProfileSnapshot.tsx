@@ -12,10 +12,10 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
   const allReady = hasDocuments && hasProfile;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Ready to Apply Card */}
-      <div className="bg-surface rounded-xl shadow-sm border border-border p-6">
-        <div className="flex items-start justify-between mb-4">
+      <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+        <div className="flex items-start justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-foreground">Ready to Apply</h2>
             <p className="text-sm text-foreground-muted mt-1">
@@ -30,7 +30,7 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
         </div>
 
         {/* Status List */}
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-4">
           <div className="flex items-center gap-3">
             <div
               className={[
@@ -91,8 +91,8 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
       </div>
 
       {/* Usage Card */}
-      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border border-primary/20 p-6">
-        <div className="flex items-start gap-3 mb-4">
+      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border border-primary/20 p-5">
+        <div className="flex items-start gap-3 mb-3">
           <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
             <Zap className="h-5 w-5 text-primary" />
           </div>
@@ -121,8 +121,8 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
       </div>
 
       {/* Tips Card */}
-      <div className="bg-surface rounded-xl shadow-sm border border-border p-6">
-        <h3 className="text-sm font-bold text-foreground mb-3">
+      <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+        <h3 className="text-sm font-bold text-foreground mb-2">
           💡 Pro Tips
         </h3>
         <ul className="space-y-2 text-xs text-foreground-muted">

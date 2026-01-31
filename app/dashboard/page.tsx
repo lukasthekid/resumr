@@ -258,14 +258,14 @@ export default async function DashboardHome() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Two-Column Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left Column (col-span-2) - Job Import Engine */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-5">
           {/* Job Import Card */}
-          <div className="bg-surface rounded-xl shadow-sm border border-border p-8">
-            <div className="mb-6">
+          <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+            <div className="mb-4">
               <h2 className="text-2xl font-bold text-foreground">New Application</h2>
               <p className="text-sm text-foreground-muted mt-1">
                 Import a job description to generate tailored documents
@@ -276,8 +276,8 @@ export default async function DashboardHome() {
           </div>
 
           {/* Recent Applications - Empty State */}
-          <div className="bg-surface rounded-xl shadow-sm border border-border p-8">
-            <div className="mb-4 flex items-start justify-between gap-4">
+          <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+            <div className="mb-3 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold text-foreground">Recent Applications</h3>
                 <p className="text-sm text-foreground-muted mt-1">
@@ -298,19 +298,19 @@ export default async function DashboardHome() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-slate-200">
-                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                           Company
                         </th>
-                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                           Role
                         </th>
-                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                           Status
                         </th>
-                        <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                           Timeline
                         </th>
-                        <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
                           Actions
                         </th>
                       </tr>
@@ -325,7 +325,7 @@ export default async function DashboardHome() {
 
                         return (
                           <tr className="bg-white hover:bg-slate-50/80 transition-colors">
-                            <td className="px-6 py-4">
+                            <td className="px-4 py-3">
                               <div className="flex items-center gap-3">
                                 {app.job.companyLogo ? (
                                   <img
@@ -348,15 +348,15 @@ export default async function DashboardHome() {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 py-3">
                               <p className="text-sm font-medium text-slate-800">
                                 {app.job.jobTitle || "—"}
                               </p>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 py-3">
                               <ApplicationStatusBadge status={app.status} />
                             </td>
-                            <td className="px-6 py-4 text-sm text-slate-600">
+                            <td className="px-4 py-3 text-sm text-slate-600">
                               {app.appliedAt
                                 ? `Applied on ${new Date(app.appliedAt).toLocaleDateString(undefined, {
                                     month: "short",
@@ -369,7 +369,7 @@ export default async function DashboardHome() {
                                     year: "numeric",
                                   })}`}
                             </td>
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-4 py-3 text-right">
                               <div className="flex items-center justify-end gap-1">
                                 <Link
                                   href={`/dashboard/jobs/${app.job.id}`}
@@ -388,7 +388,7 @@ export default async function DashboardHome() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border-2 border-dashed border-border bg-slate-50/50 py-12 px-6 text-center">
+              <div className="rounded-xl border-2 border-dashed border-border bg-slate-50/50 py-8 px-6 text-center">
                 <div className="mx-auto h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                   <FileText className="h-6 w-6 text-slate-400" />
                 </div>
