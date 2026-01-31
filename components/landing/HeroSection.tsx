@@ -76,7 +76,7 @@ export function HeroSection() {
               transformStyle: "preserve-3d",
             }}
           >
-            <BrowserFrame image="/screenshots/applications.png" alt="Resumr Dashboard" />
+            <BrowserFrame image="/screenshots/applications.webp" alt="Resumr Dashboard" />
           </div>
         </motion.div>
 

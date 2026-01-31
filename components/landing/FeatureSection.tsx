@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { BrowserFrame } from "./BrowserFrame";
-import { Sparkles, FileCheck, BarChart3 } from "lucide-react";
+import { Sparkles, FileCheck, Link2, LayoutDashboard } from "lucide-react";
 
 const features = [
   {
@@ -12,7 +12,8 @@ const features = [
     title: "Tailor your profile in seconds",
     description:
       "Our AI analyzes the job description and highlights your most relevant experience instantly.",
-    image: "/screenshots/wellcome.png",
+    keyPoint: "Powered by advanced AI that understands context and relevance",
+    image: "/screenshots/wellcome.webp",
     imageAlt: "AI Generation Modal",
     imagePosition: "right" as const,
   },
@@ -23,20 +24,34 @@ const features = [
     title: "ATS-Friendly, Human-Readable",
     description:
       "Generate perfectly formatted PDFs that pass the bots and impress hiring managers.",
-    image: "/screenshots/resume.png",
+    keyPoint: "Export to PDF with professional templates that recruiters love",
+    image: "/screenshots/resume.webp",
     imageAlt: "Professional Resume",
     imagePosition: "left" as const,
   },
   {
-    icon: BarChart3,
+    icon: Link2,
     iconColor: "text-indigo-600",
     iconBg: "bg-indigo-100",
-    title: "Never lose track of an opportunity",
+    title: "Import any job in one click",
     description:
-      "Manage your job hunt like a sales pipeline. Track every application from 'Applied' to 'Offer'.",
-    image: "/screenshots/dashboard.png",
-    imageAlt: "Application Tracker",
+      "Just paste the link of a job from any platform. We'll automatically parse and extract all the key details for you.",
+    keyPoint: "Works with LinkedIn, Indeed, Glassdoor and many more",
+    image: "/screenshots/dashboard.webp",
+    imageAlt: "Job Import",
     imagePosition: "right" as const,
+  },
+  {
+    icon: LayoutDashboard,
+    iconColor: "text-teal-600",
+    iconBg: "bg-teal-100",
+    title: "Organize your job search",
+    description:
+      "Stop using spreadsheets. View every detail of your applications in a beautiful, centralized dashboard.",
+    keyPoint: "Visual pipeline with status tracking, notes, and reminders",
+    image: "/screenshots/job-view.webp",
+    imageAlt: "Application Tracker",
+    imagePosition: "left" as const,
   },
 ];
 
@@ -121,19 +136,15 @@ function FeatureItem({
         </p>
 
         {/* Optional: Key Points */}
-        <div className="flex items-start gap-3 text-slate-700">
+        <div className="flex items-start gap-3 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
           <div
             className={`w-1.5 h-1.5 rounded-full ${
               index % 2 === 0 ? "bg-indigo-600" : "bg-teal-600"
-            } mt-2`}
+            } mt-2 shrink-0`}
           />
-          <p className="text-sm">
-            {index === 0 &&
-              "Powered by advanced AI that understands context and relevance"}
-            {index === 1 &&
-              "Export to PDF with professional templates that recruiters love"}
-            {index === 2 &&
-              "Visual pipeline with status tracking, notes, and reminders"}
+          <p className="text-sm text-slate-600 leading-relaxed">
+            <span className="font-semibold text-slate-900">Pro tip:</span>{" "}
+            {feature.keyPoint}
           </p>
         </div>
       </motion.div>

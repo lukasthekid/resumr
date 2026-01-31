@@ -1,77 +1,116 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ResumeLayout_American } from "./ResumeLayout_American";
-import "./resume.css";
+import { A4Page } from "@/components/resume";
+import { ModernTemplate } from "./ModernTemplate";
+import { useResumeStore } from "@/store";
+import type { ResumeData } from "@/types/resume";
 
-type Job = {
-  id: number;
-  companyName: string;
-  companyLogo: string;
-  jobTitle: string;
-  locationCity: string;
-  country: string;
-};
-
-type User = {
-  name: string | null;
-  email: string | null;
-  phoneNumber: string | null;
-  streetAddress: string | null;
-  city: string | null;
-  postcode: string | null;
-  country: string | null;
-  linkedInUrl: string | null;
-};
-
-type ResumeData = {
-  personal?: {
-    name?: string;
-    location?: string;
-    email?: string;
-    phone?: string;
-    github?: string;
-    linkedin?: string;
-    website?: string;
-  };
-  education?: Array<{
-    institution?: string;
-    location?: string;
-    degree?: string;
-    startDate?: string;
-    endDate?: string;
-    highlights?: string[];
-  }>;
-  workExperience?: Array<{
-    title?: string;
-    company?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-    achievements?: string[];
-  }>;
-  projects?: Array<{
-    name?: string;
-    role?: string;
-    startDate?: string;
-    endDate?: string;
-    url?: string;
-    description?: string[];
-  }>;
-  skills?: {
-    programmingLanguages?: string[];
-    technologies?: string[];
-    tools?: string[];
-    [key: string]: string[] | undefined;
-  };
-  extracurriculars?: Array<{
-    activity?: string;
-    startDate?: string;
-    endDate?: string;
-    description?: string[];
-  }>;
+// Mock resume data based on example from types/resume.ts
+const MOCK_RESUME_DATA: ResumeData = {
+  personal: {
+    name: "Lukas Muster",
+    location: "Vienna, Austria",
+    email: "lukas@burtscher.at",
+    phone: "+431234567890",
+    linkedin: "https://www.linkedin.com/in/lukas-muster",
+    github: "https://github.com/lukasmuster",
+    website: "https://lukasmuster.dev",
+  },
+  education: [
+    {
+      institution: "Georgia Institute of Technology",
+      degree: "Master of Science in Computer Science (Specialization: Machine Learning)",
+      startDate: "2018",
+      endDate: "2020",
+      location: "Atlanta, GA",
+      highlights: [
+        "GPA: 4.0/4.0",
+        "Thesis: Deep Learning for Natural Language Processing",
+      ],
+    },
+    {
+      institution: "Stanford University",
+      degree: "Bachelor of Science in Mathematical and Computational Science",
+      startDate: "2014",
+      endDate: "2018",
+      location: "Stanford, CA",
+      highlights: [
+        "Summa Cum Laude",
+        "Dean's List all semesters",
+      ],
+    },
+  ],
+  workExperience: [
+    {
+      title: "Senior Lead Software Engineer (Data Science)",
+      company: "Lumina AI",
+      location: "San Francisco, CA",
+      startDate: "2021",
+      endDate: "Present",
+      achievements: [
+        "Led the development of a proprietary RAG (Retrieval-Augmented Generation) framework, enhancing response accuracy for over 5 million monthly active users, directly applicable to building multimodal embeddings and advanced ML solutions.",
+        "Optimized large-scale model serving using NVIDIA Triton, reducing cloud compute costs by $1.2M annually, demonstrating strong MLOps and model operationalization capabilities.",
+        "Designed and implemented a real-time feature store capable of handling high event throughput with sub-10ms latency, crucial for data analysis and experimentation in a production environment.",
+      ],
+    },
+    {
+      title: "Machine Learning Engineer",
+      company: "DataStream Systems",
+      location: "Boston, MA",
+      startDate: "2018",
+      endDate: "2021",
+      achievements: [
+        "Built and maintained automated CI/CD pipelines for ML (MLOps), significantly reducing deployment cycles from weeks to hours, showcasing expertise in model operationalization.",
+        "Developed a distributed training wrapper for PyTorch, effectively scaling training across 128 GPUs with linear efficiency, relevant for building complex ML models.",
+        "Implemented an anomaly detection engine for financial transactions, blocking $45M in fraudulent activity, demonstrating practical application of supervised ML and data analysis.",
+      ],
+    },
+  ],
+  projects: [
+    {
+      name: "Autonomous Agent Playground",
+      role: "Personal Project",
+      url: "https://github.com/lukasmuster/agent-playground",
+      description: [
+        "Developed a personal suite of autonomous agents for calendar scheduling and email filtering, leveraging GPT-4 and local vector storage, directly relevant to multimodal embeddings and advanced ML.",
+      ],
+    },
+    {
+      name: "Open-Source Contributor: \"Ghost-Net\"",
+      role: "Core Contributor",
+      url: "https://github.com/ghostnet/ghostnet",
+      description: [
+        "Contributed to a lightweight neural architecture for edge devices, outperforming MobileNetV3 in latency benchmarks, demonstrating experience with advanced ML architectures and optimization.",
+      ],
+    },
+  ],
+  skills: {
+    programmingLanguages: ["Python", "SQL", "Rust", "Go", "C++"],
+    technologies: [
+      "PyTorch",
+      "TensorFlow",
+      "JAX",
+      "Hugging Face",
+      "LangChain",
+      "Kubernetes",
+      "Docker",
+      "AWS (SageMaker/Lambda)",
+      "Terraform",
+      "Ray",
+      "Apache Spark",
+      "Snowflake",
+      "Pinecone (Vector DBs)",
+      "dbt",
+      "NVIDIA Triton",
+      "Pandas",
+      "NumPy",
+      "Scikit-learn",
+    ],
+    tools: ["Git", "VS Code", "Jupyter", "Linux"],
+  },
 };
 
 export default function ResumeViewerPage() {
@@ -81,47 +120,43 @@ export default function ResumeViewerPage() {
   const hasLoadedRef = useRef(false);
 
   const [loading, setLoading] = useState(true);
-  const [job, setJob] = useState<Job | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
 
-  // Get resume data from sessionStorage
+  // Get store actions
+  const setResumeData = useResumeStore((state) => state.setResumeData);
+  const resumeData = useResumeStore((state) => state.resumeData);
+
+  // Load resume data (from sessionStorage or mock data)
   useEffect(() => {
     if (hasLoadedRef.current) {
       return;
     }
 
     const stored = sessionStorage.getItem(`resume_${jobId}`);
-    
+
     if (stored) {
       try {
         const data = JSON.parse(stored);
-        setJob(data.job);
-        setUser(data.user);
-        setResumeData(data.resumeData || null);
+        setResumeData(data.resumeData || MOCK_RESUME_DATA);
         setLoading(false);
         hasLoadedRef.current = true;
         // Clean up after load
         sessionStorage.removeItem(`resume_${jobId}`);
       } catch (e) {
         console.error("Failed to parse resume data:", e);
-        router.push(`/dashboard/jobs/${jobId}`);
+        // Fall back to mock data
+        setResumeData(MOCK_RESUME_DATA);
+        setLoading(false);
+        hasLoadedRef.current = true;
       }
     } else {
-      router.push(`/dashboard/jobs/${jobId}`);
+      // Use mock data for development/testing
+      console.log("Loading mock resume data...");
+      setResumeData(MOCK_RESUME_DATA);
+      setLoading(false);
+      hasLoadedRef.current = true;
     }
-  }, [jobId, router]);
-
-  // Update specific resume data sections
-  const updateResumeData = useCallback((updater: (data: ResumeData) => ResumeData) => {
-    setResumeData((prev) => prev ? updater(prev) : null);
-  }, []);
-
-  // Format text (bold, italic, underline)
-  const formatText = (command: string) => {
-    document.execCommand(command, false);
-  };
+  }, [jobId, setResumeData]);
 
   async function downloadPDF() {
     if (!resumeData) {
@@ -156,10 +191,10 @@ export default function ResumeViewerPage() {
       const a = document.createElement("a");
       a.href = url;
       const name = resumeData.personal?.name || "Resume";
-      a.download = `${name.replace(/[^a-z0-9]/gi, '_')}_Resume.pdf`;
+      a.download = `${name.replace(/[^a-z0-9]/gi, "_")}_Resume.pdf`;
       document.body.appendChild(a);
       a.click();
-      
+
       // Cleanup
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
@@ -171,63 +206,89 @@ export default function ResumeViewerPage() {
     }
   }
 
-  if (loading || !job || !user || !resumeData) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
         <div className="text-sm text-slate-600">Loading resume...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-100">
       {/* Fixed Header Bar */}
-      <div className="border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10 print:hidden">
-        <div className="max-w-4xl mx-auto">
+      <div className="border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10 print:hidden shadow-sm">
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between">
             <Link
               href={`/dashboard/jobs/${jobId}`}
-              className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+              className="text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-2"
             >
-              ← Back to job
+              <span>←</span>
+              <span>Back to job</span>
             </Link>
 
             <div className="flex items-center gap-3">
-              {/* Rich Text Toolbar */}
-              <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-2 py-1.5 bg-white shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => formatText("bold")}
-                  className="rounded px-2.5 py-1 text-xs font-bold transition-colors text-slate-700 hover:bg-slate-100"
-                  title="Bold"
-                >
-                  B
-                </button>
-                <button
-                  type="button"
-                  onClick={() => formatText("italic")}
-                  className="rounded px-2.5 py-1 text-xs font-bold italic transition-colors text-slate-700 hover:bg-slate-100"
-                  title="Italic"
-                >
-                  I
-                </button>
-                <button
-                  type="button"
-                  onClick={() => formatText("underline")}
-                  className="rounded px-2.5 py-1 text-xs font-bold underline transition-colors text-slate-700 hover:bg-slate-100"
-                  title="Underline"
-                >
-                  U
-                </button>
+              {/* Keyboard Shortcuts Hint */}
+              <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg">
+                <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
+                  Cmd+B
+                </kbd>
+                <span>Bold</span>
+                <span className="text-slate-300">|</span>
+                <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
+                  Cmd+I
+                </kbd>
+                <span>Italic</span>
               </div>
 
               <button
                 type="button"
                 onClick={downloadPDF}
                 disabled={downloadingPDF}
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-emerald-600 transition-colors disabled:bg-emerald-300 disabled:cursor-not-allowed print:hidden"
+                className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-emerald-600 transition-colors disabled:bg-emerald-300 disabled:cursor-not-allowed"
               >
-                {downloadingPDF ? "Generating PDF..." : "Save as PDF"}
+                {downloadingPDF ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="mr-2 h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    Save as PDF
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -236,31 +297,43 @@ export default function ResumeViewerPage() {
 
       {/* Document Container */}
       <div className="py-8 print:py-0">
-        <div className="max-w-4xl mx-auto px-6 print:px-0 print:max-w-none">
+        <div className="max-w-5xl mx-auto px-6 print:px-0">
           {/* Instructions */}
           <div className="mb-6 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 print:hidden">
             <p>
-              <span className="font-semibold">✨ Your resume is ready!</span> Click on any bullet point or description text to edit. Use the toolbar above for formatting.
+              <span className="font-semibold">✨ Your resume is ready!</span> Click
+              on any text to edit. Use <kbd className="bg-white px-2 py-1 rounded border border-indigo-200 text-xs">Cmd/Ctrl+B</kbd> for
+              bold, <kbd className="bg-white px-2 py-1 rounded border border-indigo-200 text-xs">Cmd/Ctrl+I</kbd> for italic.
             </p>
           </div>
 
-          {/* A4 Resume Document */}
-          <ResumeLayout_American 
-            resumeData={resumeData} 
-            onUpdateData={updateResumeData}
-            editable={true}
-          />
+          {/* A4 Resume Document with Modern Template */}
+          <A4Page>
+            <ModernTemplate />
+          </A4Page>
 
           {/* Tips */}
           <div className="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm p-4 text-sm text-slate-700 print:hidden">
-            <p className="font-semibold text-slate-900 mb-2">💡 Tips for editing:</p>
+            <p className="font-semibold text-slate-900 mb-2">💡 Editing Tips:</p>
             <ul className="space-y-1 text-xs text-slate-600">
-              <li>• Click any bullet point to edit the text</li>
-              <li>• Use the toolbar above for bold, italic, and underline formatting</li>
-              <li>• Press Enter to create new bullet points</li>
-              <li>• Changes are live - no need to save manually</li>
-              <li>• ATS-friendly formatting is maintained automatically</li>
-              <li>• Download as PDF when you're satisfied with the content</li>
+              <li>
+                • <strong>Click any text</strong> to start editing inline
+              </li>
+              <li>
+                • Use <kbd className="bg-slate-100 px-1.5 py-0.5 rounded text-xs">Cmd/Ctrl+B</kbd> for{" "}
+                <strong>bold</strong> and <kbd className="bg-slate-100 px-1.5 py-0.5 rounded text-xs">Cmd/Ctrl+I</kbd> for{" "}
+                <em>italic</em>
+              </li>
+              <li>
+                • Create bullet lists with <kbd className="bg-slate-100 px-1.5 py-0.5 rounded text-xs">Cmd/Ctrl+Shift+8</kbd>
+              </li>
+              <li>• Changes save automatically - no need to save manually</li>
+              <li>
+                • ATS-friendly formatting is maintained automatically
+              </li>
+              <li>
+                • Click <strong>Save as PDF</strong> when you're satisfied
+              </li>
             </ul>
           </div>
         </div>

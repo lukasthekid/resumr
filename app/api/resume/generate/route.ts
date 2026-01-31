@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import type { ResumeData } from "@/types/resume";
 
 export const runtime = "nodejs";
 
@@ -17,53 +18,6 @@ type GenerateResumeBody = {
 function asString(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
-
-type ResumeData = {
-  personal?: {
-    name?: string;
-    location?: string;
-    email?: string;
-    phone?: string;
-    github?: string;
-    linkedin?: string;
-    website?: string;
-  };
-  education?: Array<{
-    institution?: string;
-    location?: string;
-    degree?: string;
-    startDate?: string;
-    endDate?: string;
-    highlights?: string[];
-  }>;
-  workExperience?: Array<{
-    title?: string;
-    company?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-    achievements?: string[];
-  }>;
-  projects?: Array<{
-    name?: string;
-    role?: string;
-    startDate?: string;
-    endDate?: string;
-    url?: string;
-    description?: string[];
-  }>;
-  skills?: {
-    programmingLanguages?: string[];
-    technologies?: string[];
-    tools?: string[];
-  };
-  extracurriculars?: Array<{
-    activity?: string;
-    startDate?: string;
-    endDate?: string;
-    description?: string[];
-  }>;
-};
 
 function extractResumeData(payload: unknown): ResumeData | null {
   if (!payload || typeof payload !== "object") return null;

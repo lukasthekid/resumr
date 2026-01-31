@@ -1,54 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-
-type ResumeData = {
-  personal?: {
-    name?: string;
-    location?: string;
-    email?: string;
-    phone?: string;
-    github?: string;
-    linkedin?: string;
-    website?: string;
-  };
-  education?: Array<{
-    institution?: string;
-    location?: string;
-    degree?: string;
-    startDate?: string;
-    endDate?: string;
-    highlights?: string[];
-  }>;
-  workExperience?: Array<{
-    title?: string;
-    company?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-    achievements?: string[];
-  }>;
-  projects?: Array<{
-    name?: string;
-    role?: string;
-    startDate?: string;
-    endDate?: string;
-    url?: string;
-    description?: string[];
-  }>;
-  skills?: {
-    programmingLanguages?: string[];
-    technologies?: string[];
-    tools?: string[];
-    [key: string]: string[] | undefined;
-  };
-  extracurriculars?: Array<{
-    activity?: string;
-    startDate?: string;
-    endDate?: string;
-    description?: string[];
-  }>;
-};
+import type { ResumeData } from "@/types/resume";
 
 interface ResumeLayoutAmericanProps {
   resumeData: ResumeData;

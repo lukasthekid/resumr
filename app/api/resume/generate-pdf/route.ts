@@ -1,66 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
-
-type ResumeData = {
-  personal?: {
-    name?: string;
-    location?: string;
-    email?: string;
-    phone?: string;
-    github?: string;
-    linkedin?: string;
-    website?: string;
-  };
-  education?: Array<{
-    institution?: string;
-    location?: string;
-    degree?: string;
-    startDate?: string;
-    endDate?: string;
-    highlights?: string[];
-  }>;
-  workExperience?: Array<{
-    title?: string;
-    company?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-    achievements?: string[];
-  }>;
-  projects?: Array<{
-    name?: string;
-    role?: string;
-    startDate?: string;
-    endDate?: string;
-    url?: string;
-    description?: string[];
-  }>;
-  skills?: {
-    [key: string]: string[] | undefined;
-  };
-  extracurriculars?: Array<{
-    activity?: string;
-    startDate?: string;
-    endDate?: string;
-    description?: string[];
-  }>;
-};
+import type { ResumeData } from "@/types/resume";
 
 type RequestBody = {
   resumeData: ResumeData;
 };
 
 function generateResumeHTML(resumeData: ResumeData): string {
-  const { personal, education, workExperience, projects, skills, extracurriculars } = resumeData;
+  const { personal, education, workExperience, projects, skills } = resumeData;
 
-  // Build contact line
-  const contactParts = [
-    personal?.phone,
+  // Helper to format URLs for display (strip protocol, www, trailing slashes)
+  const formatUrl = (url: string): string => {
+    if (!url) return '';
+    return url
+      .replace(/^https?:\/\//, '')
+      .replace(/^www\./, '')
+      .replace(/\/$/, '');
+  };
+
+  // Build contact items (email, phone, ONE link with priority: LinkedIn > GitHub > Website)
+  const contactItems = [
     personal?.email,
-    personal?.linkedin,
-    personal?.github,
-    personal?.website,
-  ].filter(Boolean);
+    personal?.phone,
+  ];
+
+  // Add ONE link based on priority
+  if (personal?.linkedin) {
+    contactItems.push(personal.linkedin);
+  } else if (personal?.github) {
+    contactItems.push(personal.github);
+  } else if (personal?.website) {
+    contactItems.push(personal.website);
+  }
+
+  const contactLine = contactItems.filter(Boolean).join(' • ');
 
   return `
     <!DOCTYPE html>
@@ -83,76 +56,222 @@ function generateResumeHTML(resumeData: ResumeData): string {
             width: 210mm;
             min-height: 297mm;
             margin: 0;
-            padding: 10mm 10mm 10mm 10mm;
-            font-family: Arial, Calibri, sans-serif;
-            font-size: 10pt;
-            line-height: 1.2;
-            color: #000;
+            padding: 8mm 10mm;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.3;
+            color: #111827;
             background: white;
           }
           
+          /* HEADER - Full Width, Centered */
           .header {
-            margin-bottom: 0.6em;
+            margin-bottom: 1em;
+            padding-bottom: 0.75em;
+            border-bottom: 2px solid #1f2937;
             text-align: center;
           }
           
           .header h1 {
-            font-size: 20pt;
+            font-size: 24pt;
             font-weight: 700;
-            margin: 0 0 0.25em 0;
+            margin: 0 0 0.3em 0;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            color: #111827;
           }
           
           .contact {
-            font-size: 9pt;
-            color: #333;
+            font-size: 8pt;
+            color: #374151;
+            line-height: 1.4;
+          }
+          
+          /* TWO COLUMN LAYOUT */
+          .container {
+            display: grid;
+            grid-template-columns: 30% 70%;
+            gap: 1.5em;
+          }
+          
+          .left-column {
+            padding-right: 0.5em;
+          }
+          
+          .right-column {
+            padding-left: 0.5em;
+          }
+          
+          /* SECTION HEADERS */
+          h2 {
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 2px solid #1f2937;
+            padding-bottom: 0.2em;
+            margin-bottom: 0.7em;
+            color: #111827;
           }
           
           section {
-            margin-bottom: 0.75em;
+            margin-bottom: 1.2em;
           }
           
-          h2 {
-            font-size: 11pt;
+          /* EDUCATION SECTION */
+          .edu-entry {
+            margin-bottom: 0.9em;
+            font-size: 8pt;
+          }
+          
+          .edu-institution {
             font-weight: 700;
-            border-bottom: 1px solid #000;
-            padding-bottom: 0.15em;
-            margin-bottom: 0.5em;
+            color: #111827;
+            line-height: 1.2;
           }
           
-          .entry {
-            margin-bottom: 0.6em;
+          .edu-dates {
+            font-size: 7pt;
+            color: #6b7280;
+            margin-top: 0.15em;
           }
           
-          .entry-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.2em;
-          }
-          
-          .entry-title {
-            font-weight: 600;
-          }
-          
-          .entry-subtitle {
+          .edu-degree {
             font-style: italic;
-            font-size: 9.5pt;
+            color: #374151;
+            margin-top: 0.15em;
+            line-height: 1.2;
           }
           
-          .entry-right {
-            text-align: right;
-            font-size: 9.5pt;
-          }
-          
-          ul {
-            margin: 0.25em 0 0 1.2em;
-            padding: 0;
+          .edu-highlights {
+            margin-top: 0.4em;
+            padding-left: 1em;
             list-style-type: disc;
           }
           
-          li {
+          .edu-highlights li {
             margin-bottom: 0.15em;
+            color: #374151;
+          }
+          
+          /* SKILLS SECTION */
+          .skills-entry {
+            font-size: 8pt;
+            margin-bottom: 0.4em;
+            line-height: 1.5;
+          }
+          
+          .skills-entry strong {
+            font-weight: 600;
+            color: #111827;
+          }
+          
+          .skills-entry span {
+            color: #374151;
+          }
+          
+          /* WORK EXPERIENCE SECTION */
+          .exp-entry {
+            margin-bottom: 1em;
+          }
+          
+          .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.15em;
+          }
+          
+          .exp-left {
+            flex: 1;
+          }
+          
+          .exp-title {
+            font-weight: 700;
+            font-size: 9.5pt;
+            color: #111827;
+          }
+          
+          .exp-company {
+            font-weight: 500;
+            font-size: 8pt;
+            color: #374151;
+          }
+          
+          .exp-right {
+            text-align: right;
+            font-size: 8pt;
+            color: #4b5563;
+            margin-left: 1em;
+            min-width: 5em;
+          }
+          
+          .exp-location {
+            font-size: 8pt;
+          }
+          
+          .exp-dates {
+            margin-top: 0.1em;
+          }
+          
+          .exp-achievements {
+            margin-top: 0.4em;
+            padding-left: 1em;
+            list-style-type: disc;
+          }
+          
+          .exp-achievements li {
+            margin-bottom: 0.3em;
+            font-size: 8pt;
+            color: #374151;
+            line-height: 1.4;
+          }
+          
+          /* PROJECTS SECTION */
+          .project-entry {
+            margin-bottom: 0.9em;
+          }
+          
+          .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.15em;
+          }
+          
+          .project-name {
+            font-weight: 600;
+            font-size: 9.5pt;
+            color: #111827;
+          }
+          
+          .project-role {
+            font-style: italic;
+            font-size: 8pt;
+            color: #4b5563;
+            margin-left: 1em;
+          }
+          
+          .project-url {
+            font-size: 8pt;
+            color: #2563eb;
+            text-decoration: underline;
+            text-decoration-color: #bfdbfe;
+            margin-top: 0.2em;
+            display: block;
+          }
+          
+          .project-descriptions {
+            margin-top: 0.4em;
+            padding-left: 1em;
+            list-style-type: disc;
+          }
+          
+          .project-descriptions li {
+            margin-bottom: 0.3em;
+            font-size: 8pt;
+            color: #374151;
+            line-height: 1.4;
           }
           
           /* Support for rich text formatting */
@@ -167,159 +286,115 @@ function generateResumeHTML(resumeData: ResumeData): string {
           u {
             text-decoration: underline;
           }
-          
-          .skills-entry {
-            display: block;
-            margin-bottom: 0.3em;
-            line-height: 1.5;
-          }
-          
-          .skills-entry strong {
-            font-weight: 600;
-          }
-          
-          .project-header {
-            margin-bottom: 0.2em;
-          }
-          
-          .project-name {
-            font-weight: 600;
-          }
-          
-          .project-role {
-            font-style: italic;
-          }
-          
-          .project-url {
-            font-size: 9pt;
-            color: #0066cc;
-          }
         </style>
       </head>
       <body>
         <!-- HEADER -->
         <div class="header">
           <h1>${personal?.name || "YOUR NAME"}</h1>
-          <div class="contact">${contactParts.join(" | ")}</div>
+          <div class="contact">${contactLine}</div>
         </div>
 
-        <!-- EDUCATION -->
-        ${education && education.length > 0 ? `
-          <section>
-            <h2>Education</h2>
-            ${education.map(edu => `
-              <div class="entry">
-                <div class="entry-header">
-                  <div>
-                    <div class="entry-title">${edu.institution || ""}</div>
-                    ${edu.degree ? `<div class="entry-subtitle">${edu.degree}</div>` : ""}
+        <!-- TWO COLUMN LAYOUT -->
+        <div class="container">
+          <!-- LEFT COLUMN -->
+          <div class="left-column">
+            <!-- EDUCATION -->
+            ${education && education.length > 0 ? `
+              <section>
+                <h2>EDUCATION</h2>
+                ${education.map(edu => `
+                  <div class="edu-entry">
+                    <div class="edu-institution">${edu.institution || ""}</div>
+                    ${edu.startDate || edu.endDate ? `
+                      <div class="edu-dates">${edu.startDate || ""} – ${edu.endDate || ""}</div>
+                    ` : ""}
+                    ${edu.degree ? `<div class="edu-degree">${edu.degree}</div>` : ""}
+                    ${edu.highlights && edu.highlights.length > 0 ? `
+                      <ul class="edu-highlights">
+                        ${edu.highlights.map(h => `<li>${h}</li>`).join("")}
+                      </ul>
+                    ` : ""}
                   </div>
-                  <div class="entry-right">
-                    ${edu.location ? `<div>${edu.location}</div>` : ""}
-                    ${edu.startDate || edu.endDate ? `<div>${edu.startDate || ""} – ${edu.endDate || "Present"}</div>` : ""}
-                  </div>
-                </div>
-                ${edu.highlights && edu.highlights.length > 0 ? `
-                  <ul>
-                    ${edu.highlights.map(h => `<li>${h}</li>`).join("")}
-                  </ul>
-                ` : ""}
-              </div>
-            `).join("")}
-          </section>
-        ` : ""}
+                `).join("")}
+              </section>
+            ` : ""}
 
-        <!-- EXPERIENCE -->
-        ${workExperience && workExperience.length > 0 ? `
-          <section>
-            <h2>Experience</h2>
-            ${workExperience.map(exp => `
-              <div class="entry">
-                <div class="entry-header">
-                  <div>
-                    <div class="entry-title">${exp.title || ""}</div>
-                    ${exp.company ? `<div class="entry-subtitle">${exp.company}</div>` : ""}
-                  </div>
-                  <div class="entry-right">
-                    ${exp.location ? `<div>${exp.location}</div>` : ""}
-                    ${exp.startDate || exp.endDate ? `<div>${exp.startDate || ""} – ${exp.endDate || "Present"}</div>` : ""}
-                  </div>
-                </div>
-                ${exp.achievements && exp.achievements.length > 0 ? `
-                  <ul>
-                    ${exp.achievements.map(a => `<li>${a}</li>`).join("")}
-                  </ul>
-                ` : ""}
-              </div>
-            `).join("")}
-          </section>
-        ` : ""}
-
-        <!-- PROJECTS -->
-        ${projects && projects.length > 0 ? `
-          <section>
-            <h2>Projects</h2>
-            ${projects.map(project => `
-              <div class="entry">
-                <div class="project-header">
-                  <span class="project-name">${project.name || ""}</span>
-                  ${project.role ? `<span class="project-role"> (${project.role})</span>` : ""}
-                  ${project.url ? `<span class="project-url"> | ${project.url}</span>` : ""}
-                </div>
-                ${project.description && project.description.length > 0 ? `
-                  <ul>
-                    ${project.description.map(d => `<li>${d}</li>`).join("")}
-                  </ul>
-                ` : ""}
-              </div>
-            `).join("")}
-          </section>
-        ` : ""}
-
-        <!-- SKILLS -->
-        ${skills && Object.keys(skills).length > 0 ? `
-          <section>
-            <h2>Skills</h2>
-            ${Object.entries(skills).map(([category, items]) => {
-              if (!items || items.length === 0) return "";
-              
-              const formattedCategory = category
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, str => str.toUpperCase())
-                .trim();
-              
-              return `
-                <div class="skills-entry">
-                  <strong>${formattedCategory}:</strong> ${items.join(", ")}
-                </div>
-              `;
-            }).join("")}
-          </section>
-        ` : ""}
-
-        <!-- EXTRACURRICULARS -->
-        ${extracurriculars && extracurriculars.length > 0 ? `
-          <section>
-            <h2>Extracurricular Activities</h2>
-            ${extracurriculars.map(activity => `
-              <div class="entry">
-                <div class="entry-header">
-                  <div class="entry-title">${activity.activity || ""}</div>
-                  ${activity.startDate || activity.endDate ? `
-                    <div class="entry-right">
-                      ${activity.startDate || ""} – ${activity.endDate || "Present"}
+            <!-- SKILLS -->
+            ${skills && Object.keys(skills).length > 0 ? `
+              <section>
+                <h2>SKILLS</h2>
+                ${Object.entries(skills).map(([category, items]) => {
+                  if (!items || items.length === 0) return "";
+                  
+                  const formattedCategory = category
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                    .trim();
+                  
+                  return `
+                    <div class="skills-entry">
+                      <strong>${formattedCategory}:</strong>
+                      <span> ${items.join(", ")}</span>
                     </div>
-                  ` : ""}
-                </div>
-                ${activity.description && activity.description.length > 0 ? `
-                  <ul>
-                    ${activity.description.map(d => `<li>${d}</li>`).join("")}
-                  </ul>
-                ` : ""}
-              </div>
-            `).join("")}
-          </section>
-        ` : ""}
+                  `;
+                }).join("")}
+              </section>
+            ` : ""}
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="right-column">
+            <!-- WORK EXPERIENCE -->
+            ${workExperience && workExperience.length > 0 ? `
+              <section>
+                <h2>PROFESSIONAL EXPERIENCE</h2>
+                ${workExperience.map(exp => `
+                  <div class="exp-entry">
+                    <div class="exp-header">
+                      <div class="exp-left">
+                        <div class="exp-title">${exp.title || ""}</div>
+                        ${exp.company ? `<div class="exp-company">${exp.company}</div>` : ""}
+                      </div>
+                      <div class="exp-right">
+                        ${exp.location ? `<div class="exp-location">${exp.location}</div>` : ""}
+                        ${exp.startDate || exp.endDate ? `
+                          <div class="exp-dates">${exp.startDate || ""} – ${exp.endDate || "Present"}</div>
+                        ` : ""}
+                      </div>
+                    </div>
+                    ${exp.achievements && exp.achievements.length > 0 ? `
+                      <ul class="exp-achievements">
+                        ${exp.achievements.map(a => `<li>${a}</li>`).join("")}
+                      </ul>
+                    ` : ""}
+                  </div>
+                `).join("")}
+              </section>
+            ` : ""}
+
+            <!-- PROJECTS -->
+            ${projects && projects.length > 0 ? `
+              <section>
+                <h2>PROJECTS</h2>
+                ${projects.map(project => `
+                  <div class="project-entry">
+                    <div class="project-header">
+                      <span class="project-name">${project.name || ""}</span>
+                      ${project.role ? `<span class="project-role">${project.role}</span>` : ""}
+                    </div>
+                    ${project.url ? `<div class="project-url">🔗 ${formatUrl(project.url)}</div>` : ""}
+                    ${project.description && project.description.length > 0 ? `
+                      <ul class="project-descriptions">
+                        ${project.description.map(d => `<li>${d}</li>`).join("")}
+                      </ul>
+                    ` : ""}
+                  </div>
+                `).join("")}
+              </section>
+            ` : ""}
+          </div>
+        </div>
       </body>
     </html>
   `;
