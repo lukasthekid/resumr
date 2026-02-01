@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { A4Page } from "@/components/resume";
 import { ModernTemplate } from "./ModernTemplate";
+import { ClassicTemplate } from "./ClassicTemplate";
 import { useResumeStore } from "@/store";
 import type { ResumeData } from "@/types/resume";
 
@@ -121,6 +122,7 @@ export default function ResumeViewerPage() {
 
   const [loading, setLoading] = useState(true);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [layout, setLayout] = useState<"modern" | "classic">("modern");
 
   // Get store actions
   const setResumeData = useResumeStore((state) => state.setResumeData);
@@ -175,6 +177,7 @@ export default function ResumeViewerPage() {
         },
         body: JSON.stringify({
           resumeData,
+          layout,
         }),
       });
 
@@ -229,6 +232,19 @@ export default function ResumeViewerPage() {
             </Link>
 
             <div className="flex items-center gap-3">
+              {/* Layout Selector */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-slate-600 font-medium">Layout:</label>
+                <select
+                  value={layout}
+                  onChange={(e) => setLayout(e.target.value as "modern" | "classic")}
+                  className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-700 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                >
+                  <option value="modern">Modern</option>
+                  <option value="classic">Classic</option>
+                </select>
+              </div>
+
               {/* Keyboard Shortcuts Hint */}
               <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg">
                 <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
@@ -307,9 +323,9 @@ export default function ResumeViewerPage() {
             </p>
           </div>
 
-          {/* A4 Resume Document with Modern Template */}
+          {/* A4 Resume Document with Selected Template */}
           <A4Page>
-            <ModernTemplate />
+            {layout === "modern" ? <ModernTemplate /> : <ClassicTemplate />}
           </A4Page>
 
           {/* Tips */}
