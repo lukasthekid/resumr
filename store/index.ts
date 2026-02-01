@@ -16,3 +16,13 @@ export {
   useExtracurriculars,
   useResumeActions,
 } from './useResumeStore';
+
+export {
+  useCoverLetterStore,
+  useCoverLetterData,
+  useIsCoverLetterInitialized,
+  useCoverLetterUser,
+  useCoverLetterJob,
+  useCoverLetterBodyHtml,
+  useCoverLetterActions,
+} from './useCoverLetterStore';

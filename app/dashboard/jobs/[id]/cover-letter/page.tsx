@@ -3,32 +3,9 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
+import { useCoverLetterStore } from "@/store";
 import { CoverLetterLayout_Classic } from "./CoverLetterLayout_Classic";
-import { CoverLetterLayout_Sidebar } from "./CoverLetterLayout_Sidebar";
-import "./cover-letter.css";
-
-type Job = {
-  id: number;
-  companyName: string;
-  companyLogo: string;
-  jobTitle: string;
-  locationCity: string;
-  country: string;
-};
-
-type User = {
-  name: string | null;
-  email: string | null;
-  phoneNumber: string | null;
-  streetAddress: string | null;
-  city: string | null;
-  postcode: string | null;
-  country: string | null;
-  linkedInUrl: string | null;
-};
+import type { CoverLetterData } from "@/types/coverLetter";
 
 export default function CoverLetterEditorPage() {
   const params = useParams();
@@ -37,63 +14,62 @@ export default function CoverLetterEditorPage() {
   const hasLoadedRef = useRef(false);
 
   const [loading, setLoading] = useState(true);
-  const [job, setJob] = useState<Job | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [coverLetterBody, setCoverLetterBody] = useState("");
-  const [layout, setLayout] = useState<"classic" | "sidebar">("classic");
   const [downloadingPDF, setDownloadingPDF] = useState(false);
 
-  // Initialize editor with empty content first (body text only)
-  const editor = useEditor({
-    extensions: [StarterKit, Underline],
-    content: "",
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class: "focus:outline-none",
-      },
-    },
-  });
+  // Get store state and actions
+  const coverLetterData = useCoverLetterStore((state) => state.coverLetterData);
+  const setCoverLetterData = useCoverLetterStore((state) => state.setCoverLetterData);
 
-  // Get cover letter from sessionStorage (passed from generator)
+  // Load cover letter data from sessionStorage
   useEffect(() => {
-    // Prevent double-run in React Strict Mode
     if (hasLoadedRef.current) {
       return;
     }
 
     const stored = sessionStorage.getItem(`coverLetter_${jobId}`);
-    
+
     if (stored) {
       try {
         const data = JSON.parse(stored);
-        setJob(data.job);
-        setUser(data.user);
-        setCoverLetterBody(data.coverLetterBody || "");
+        
+        // Format the date
+        const todayDate = new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+
+        // Transform to our CoverLetterData structure
+        const coverLetterData: CoverLetterData = {
+          user: data.user,
+          job: {
+            ...data.job,
+            id: data.job?.id || jobId,
+          },
+          date: todayDate,
+          bodyHtml: data.coverLetterBody
+            ? `<p>${data.coverLetterBody.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>`
+            : "",
+        };
+
+        setCoverLetterData(coverLetterData);
         setLoading(false);
         hasLoadedRef.current = true;
-        // Clean up immediately after successful load
+
+        // Clean up after load
         sessionStorage.removeItem(`coverLetter_${jobId}`);
       } catch (e) {
         console.error("Failed to parse cover letter data:", e);
         router.push(`/dashboard/jobs/${jobId}`);
       }
     } else {
+      console.warn("No cover letter data found in sessionStorage");
       router.push(`/dashboard/jobs/${jobId}`);
     }
-  }, [jobId, router]);
-
-  // Update editor content when data is loaded
-  useEffect(() => {
-    if (!editor || !coverLetterBody) return;
-
-    // Only set the body content (editable part)
-    const bodyHTML = `<p>${coverLetterBody.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
-    editor.commands.setContent(bodyHTML);
-  }, [editor, coverLetterBody]);
+  }, [jobId, router, setCoverLetterData]);
 
   async function downloadPDF() {
-    if (!editor || !job || !user) {
+    if (!coverLetterData) {
       alert("Cannot generate PDF: missing data");
       return;
     }
@@ -101,9 +77,6 @@ export default function CoverLetterEditorPage() {
     setDownloadingPDF(true);
 
     try {
-      // Get the current editor HTML content
-      const bodyHtml = editor.getHTML();
-
       // Send request to server-side PDF generation
       const response = await fetch("/api/cover-letter/generate-pdf", {
         method: "POST",
@@ -111,11 +84,10 @@ export default function CoverLetterEditorPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          layout,
-          user,
-          job,
-          todayDate,
-          bodyHtml,
+          user: coverLetterData.user,
+          job: coverLetterData.job,
+          todayDate: coverLetterData.date,
+          bodyHtml: coverLetterData.bodyHtml,
         }),
       });
 
@@ -131,10 +103,10 @@ export default function CoverLetterEditorPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${job.companyName.replace(/[^a-z0-9]/gi, '_')}_${job.jobTitle.replace(/[^a-z0-9]/gi, '_')}_Cover_Letter.pdf`;
+      a.download = `${coverLetterData.job.companyName.replace(/[^a-z0-9]/gi, "_")}_${coverLetterData.job.jobTitle.replace(/[^a-z0-9]/gi, "_")}_Cover_Letter.pdf`;
       document.body.appendChild(a);
       a.click();
-      
+
       // Cleanup
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
@@ -146,132 +118,90 @@ export default function CoverLetterEditorPage() {
     }
   }
 
-  if (loading || !job || !user) {
+  if (loading || !coverLetterData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
         <div className="text-sm text-slate-600">Loading cover letter...</div>
       </div>
     );
   }
 
-  const todayDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const userContactLine = [
-    user.streetAddress,
-    user.email,
-    user.phoneNumber,
-  ]
-    .filter(Boolean)
-    .join(" • ");
-
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-100">
       {/* Fixed Header Bar */}
-      <div className="border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10 print:hidden">
-        <div className="max-w-4xl mx-auto">
+      <div className="border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10 print:hidden shadow-sm">
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between">
             <Link
               href={`/dashboard/jobs/${jobId}`}
-              className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+              className="text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-2"
             >
-              ← Back to job
+              <span>←</span>
+              <span>Back to job</span>
             </Link>
 
             <div className="flex items-center gap-3">
-              {/* Layout Selector */}
-              <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-2 py-1.5 bg-white shadow-sm">
-                <span className="text-xs text-slate-600 mr-1">Layout:</span>
-                <button
-                  type="button"
-                  onClick={() => setLayout("classic")}
-                  className={[
-                    "rounded px-2.5 py-1 text-xs transition-colors",
-                    layout === "classic"
-                      ? "bg-sky-500 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
-                  ].join(" ")}
-                >
-                  Classic
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLayout("sidebar")}
-                  className={[
-                    "rounded px-2.5 py-1 text-xs transition-colors",
-                    layout === "sidebar"
-                      ? "bg-sky-500 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
-                  ].join(" ")}
-                >
-                  Sidebar
-                </button>
+              {/* Keyboard Shortcuts Hint */}
+              <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg">
+                <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
+                  Cmd+B
+                </kbd>
+                <span>Bold</span>
+                <span className="text-slate-300">|</span>
+                <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
+                  Cmd+I
+                </kbd>
+                <span>Italic</span>
               </div>
 
-              {/* Rich Text Toolbar */}
-              <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-2 py-1.5 bg-white shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => editor?.chain().focus().toggleBold().run()}
-                  className={[
-                    "rounded px-2.5 py-1 text-xs font-bold transition-colors",
-                    editor?.isActive("bold")
-                      ? "bg-sky-500 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
-                  ].join(" ")}
-                >
-                  B
-                </button>
-                <button
-                  type="button"
-                  onClick={() => editor?.chain().focus().toggleItalic().run()}
-                  className={[
-                    "rounded px-2.5 py-1 text-xs font-bold italic transition-colors",
-                    editor?.isActive("italic")
-                      ? "bg-sky-500 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
-                  ].join(" ")}
-                >
-                  I
-                </button>
-                <button
-                  type="button"
-                  onClick={() => editor?.chain().focus().toggleUnderline().run()}
-                  className={[
-                    "rounded px-2.5 py-1 text-xs font-bold underline transition-colors",
-                    editor?.isActive("underline")
-                      ? "bg-sky-500 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
-                  ].join(" ")}
-                >
-                  U
-                </button>
-                <div className="mx-1 h-4 w-px bg-slate-200" />
-                <button
-                  type="button"
-                  onClick={() => editor?.chain().focus().toggleBulletList().run()}
-                  className={[
-                    "rounded px-2.5 py-1 text-xs transition-colors",
-                    editor?.isActive("bulletList")
-                      ? "bg-sky-500 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
-                  ].join(" ")}
-                >
-                  • List
-                </button>
-              </div>
-
-            <button
-              type="button"
-              onClick={downloadPDF}
-              disabled={downloadingPDF}
-              className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-emerald-600 transition-colors disabled:bg-emerald-300 disabled:cursor-not-allowed print:hidden"
-            >
-              {downloadingPDF ? "Generating PDF..." : "Save as PDF"}
-            </button>
+              <button
+                type="button"
+                onClick={downloadPDF}
+                disabled={downloadingPDF}
+                className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-emerald-600 transition-colors disabled:bg-emerald-300 disabled:cursor-not-allowed"
+              >
+                {downloadingPDF ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="mr-2 h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    Save as PDF
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -279,41 +209,51 @@ export default function CoverLetterEditorPage() {
 
       {/* Document Container */}
       <div className="py-8 print:py-0">
-        <div className="max-w-4xl mx-auto px-6 print:px-0 print:max-w-none">
+        <div className="max-w-5xl mx-auto px-6 print:px-0">
           {/* Instructions */}
-          <div className="mb-6 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900 print:hidden">
+          <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 print:hidden">
             <p>
-              <span className="font-semibold">✨ Your cover letter is ready!</span> Click on the body text to edit. Header is fixed, body is fully editable. Click "Save as PDF" to download an ATS-friendly PDF.
+              <span className="font-semibold">✨ Your cover letter is ready!</span> Click
+              on any text to edit. Use{" "}
+              <kbd className="bg-white px-2 py-1 rounded border border-emerald-200 text-xs">
+                Cmd/Ctrl+B
+              </kbd>{" "}
+              for bold,{" "}
+              <kbd className="bg-white px-2 py-1 rounded border border-emerald-200 text-xs">
+                Cmd/Ctrl+I
+              </kbd>{" "}
+              for italic.
             </p>
           </div>
 
-          {/* A4 Paper - Route to appropriate layout */}
-          {layout === "classic" ? (
-            <CoverLetterLayout_Classic
-              user={user}
-              job={job}
-              todayDate={todayDate}
-              editor={editor}
-            />
-          ) : (
-            <CoverLetterLayout_Sidebar
-              user={user}
-              job={job}
-              todayDate={todayDate}
-              editor={editor}
-            />
-          )}
+          {/* Cover Letter Document */}
+          <CoverLetterLayout_Classic />
 
           {/* Tips */}
           <div className="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm p-4 text-sm text-slate-700 print:hidden">
-            <p className="font-semibold text-slate-900 mb-2">💡 Tips for editing:</p>
+            <p className="font-semibold text-slate-900 mb-2">💡 Editing Tips:</p>
             <ul className="space-y-1 text-xs text-slate-600">
-              <li>• Click anywhere in the body text to start editing</li>
-              <li>• Use the toolbar above for bold, italic, underline, and lists</li>
-              <li>• Add your own closing (e.g., "Sincerely, [Your Name]") at the end</li>
-              <li>• Keep it concise - ATS systems prefer plain text with minimal formatting</li>
-              <li>• PDF is generated server-side with real, parsable text (ATS-friendly)</li>
-              <li>• This page doesn't save changes - download before leaving</li>
+              <li>
+                • <strong>Click any text</strong> to start editing inline
+              </li>
+              <li>
+                • Use{" "}
+                <kbd className="bg-slate-100 px-1.5 py-0.5 rounded text-xs">Cmd/Ctrl+B</kbd> for{" "}
+                <strong>bold</strong> and{" "}
+                <kbd className="bg-slate-100 px-1.5 py-0.5 rounded text-xs">Cmd/Ctrl+I</kbd> for{" "}
+                <em>italic</em>
+              </li>
+              <li>
+                • Create bullet lists with{" "}
+                <kbd className="bg-slate-100 px-1.5 py-0.5 rounded text-xs">
+                  Cmd/Ctrl+Shift+8
+                </kbd>
+              </li>
+              <li>• Changes save automatically - no need to save manually</li>
+              <li>• ATS-friendly formatting is maintained automatically</li>
+              <li>
+                • Click <strong>Save as PDF</strong> when you're satisfied
+              </li>
             </ul>
           </div>
         </div>

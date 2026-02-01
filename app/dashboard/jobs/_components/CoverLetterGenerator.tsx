@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
 import { GenerationProcessingView } from "./GenerationProcessingView";
+import type { CoverLetterGenerationResponse } from "@/types/coverLetter";
 
 const COMMON_LANGUAGES = [
   "English",
@@ -17,16 +18,6 @@ const COMMON_LANGUAGES = [
   "Turkish",
 ] as const;
 
-type GenerateResponse = {
-  ok?: boolean;
-  error?: string;
-  webhookStatus?: number;
-  coverLetter?: string | null;
-  job?: any;
-  user?: any;
-  webhookResponse?: unknown;
-};
-
 export function CoverLetterGenerator({ jobId }: { jobId: number }) {
   const router = useRouter();
   const [language, setLanguage] = useState<(typeof COMMON_LANGUAGES)[number]>(
@@ -34,7 +25,7 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
   );
   const [instructions, setInstructions] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<GenerateResponse | null>(null);
+  const [result, setResult] = useState<CoverLetterGenerationResponse | null>(null);
 
   const canGenerate = useMemo(() => {
     return !submitting && language.trim().length > 0;
@@ -54,7 +45,7 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
         }),
       });
 
-      const json = (await res.json().catch(() => null)) as GenerateResponse | null;
+      const json = (await res.json().catch(() => null)) as CoverLetterGenerationResponse | null;
 
       console.log("Generator response:", { 
         statusOk: res.ok, 
@@ -91,12 +82,14 @@ export function CoverLetterGenerator({ jobId }: { jobId: number }) {
         json ??
           ({
             ok: false,
+            webhookStatus: res.status,
             error: `Generation failed (HTTP ${res.status}).`,
-          } satisfies GenerateResponse)
+          } satisfies CoverLetterGenerationResponse)
       );
     } catch (e) {
       setResult({
         ok: false,
+        webhookStatus: 0,
         error: e instanceof Error ? e.message : "Generation failed.",
       });
     } finally {
