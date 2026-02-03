@@ -61,6 +61,10 @@ jobs:
           # N8N Integration
           N8N_API_KEY=${{ secrets.N8N_API_KEY }}
 
+          # Google
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+
           # Node Environment
           NODE_ENV=production
           

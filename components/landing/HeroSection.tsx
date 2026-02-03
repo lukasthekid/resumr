@@ -43,7 +43,7 @@ export function HeroSection() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link
-              href="/signup"
+              href="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-lg bg-indigo-600 text-white font-semibold text-lg shadow-lg shadow-indigo-500/50 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/60 transition-all duration-200 hover:scale-105"
             >
               Get Started for Free

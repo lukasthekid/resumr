@@ -62,9 +62,8 @@ export default async function SettingsPage({
   const session = await auth();
   if (!session?.user) redirect("/");
 
-  const userIdRaw = (session.user as { id?: string }).id;
-  const userId = Number(userIdRaw);
-  if (!Number.isFinite(userId)) redirect("/");
+  const userId = (session.user as { id?: string }).id;
+  if (!userId || typeof userId !== "string") redirect("/");
 
   const sp = (await searchParams) ?? {};
   const saved = sp.saved === "1";
@@ -88,7 +87,7 @@ export default async function SettingsPage({
   const countRows = await prisma.$queryRaw<CountResult[]>`
     SELECT COUNT(*) as count
     FROM documents
-    WHERE metadata->>'user_id' = ${String(userId)}
+    WHERE metadata->>'user_id' = ${userId}
   `;
   const documentCount = Number(countRows[0]?.count ?? 0);
 
@@ -97,9 +96,8 @@ export default async function SettingsPage({
 
     const session = await auth();
     if (!session?.user) redirect("/");
-    const userIdRaw = (session.user as { id?: string }).id;
-    const userId = Number(userIdRaw);
-    if (!Number.isFinite(userId)) redirect("/");
+    const userId = (session.user as { id?: string }).id;
+    if (!userId || typeof userId !== "string") redirect("/");
 
     const parsed = profileSchema.safeParse({
       name: formData.get("name") ?? "",

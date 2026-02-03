@@ -13,9 +13,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userIdRaw = (session.user as { id?: string }).id;
-  const userId = Number(userIdRaw);
-  if (!Number.isFinite(userId)) {
+  const userId = (session.user as { id?: string }).id;
+  if (!userId || typeof userId !== "string") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -23,7 +22,7 @@ export async function GET() {
     const rows = await prisma.$queryRaw<DocumentFileRow[]>`
       SELECT DISTINCT metadata->>'file_name' AS file_name
       FROM documents
-      WHERE metadata->>'user_id' = ${String(userId)}
+      WHERE metadata->>'user_id' = ${userId}
         AND metadata ? 'file_name'
         AND (metadata->>'file_name') IS NOT NULL
         AND (metadata->>'file_name') <> ''

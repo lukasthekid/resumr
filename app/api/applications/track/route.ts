@@ -27,9 +27,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userIdRaw = (session.user as { id?: string }).id;
-  const userId = Number(userIdRaw);
-  if (!Number.isFinite(userId)) {
+  const userId = (session.user as { id?: string }).id;
+  if (!userId || typeof userId !== "string") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -63,7 +62,7 @@ export async function POST(req: Request) {
 
   // Verify user exists (this ensures the userId is valid for the FK constraint)
   const user = await prisma.user.findUnique({
-    where: { id: userId as any },
+    where: { id: userId },
     select: { id: true },
   });
   
@@ -75,12 +74,12 @@ export async function POST(req: Request) {
   const application = await (prisma as any).jobApplication.upsert({
     where: {
       userId_jobId: {
-        userId: user.id,
+        userId: userId,
         jobId,
       },
     },
     create: {
-      userId: user.id,
+      userId: userId,
       jobId,
       status,
       notes: notes || null,

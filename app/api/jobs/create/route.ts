@@ -22,9 +22,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const userIdRaw = (session.user as { id?: string }).id;
-    const userId = Number(userIdRaw);
-    if (!Number.isFinite(userId)) {
+    const userId = (session.user as { id?: string }).id;
+    if (!userId || typeof userId !== "string") {
       return NextResponse.json(
         { ok: false, error: "Invalid user ID" },
         { status: 400 }

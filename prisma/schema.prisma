@@ -1,21 +1,19 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
+  id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-
-  // For Credentials provider
-  passwordHash  String?
+  passwordHash  String? // Deprecated - no longer used, kept for migration compatibility
 
   // Profile settings
   phoneNumber   String?
@@ -65,7 +63,7 @@ enum ApplicationStatus {
 
 model JobApplication {
   id          Int               @id @default(autoincrement())
-  userId      Int
+  userId      String
   jobId       Int
   status      ApplicationStatus @default(SAVED)
   notes       String?           @db.Text
@@ -84,7 +82,7 @@ model JobApplication {
 
 model Account {
   id                 String  @id @default(cuid())
-  userId             Int
+  userId             String
   type               String
   provider           String
   providerAccountId  String
@@ -104,7 +102,7 @@ model Account {
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
-  userId       Int
+  userId       String
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

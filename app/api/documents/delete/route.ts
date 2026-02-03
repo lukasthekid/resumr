@@ -17,9 +17,8 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userIdRaw = (session.user as { id?: string }).id;
-  const userId = Number(userIdRaw);
-  if (!Number.isFinite(userId)) {
+  const userId = (session.user as { id?: string }).id;
+  if (!userId || typeof userId !== "string") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -37,7 +36,7 @@ export async function DELETE(req: Request) {
   try {
     const deleted = await prisma.$executeRaw`
       DELETE FROM documents
-      WHERE metadata->>'user_id' = ${String(userId)}
+      WHERE metadata->>'user_id' = ${userId}
         AND metadata->>'file_name' = ${decodedFileName}
     `;
 

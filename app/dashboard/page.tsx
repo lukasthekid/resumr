@@ -12,9 +12,8 @@ export default async function DashboardHome() {
   const session = await auth();
   if (!session?.user) redirect("/");
 
-  const userIdRaw = (session.user as { id?: string }).id;
-  const userId = Number(userIdRaw);
-  if (!Number.isFinite(userId)) redirect("/");
+  const userId = (session.user as { id?: string }).id;
+  if (!userId || typeof userId !== "string") redirect("/");
 
   const email = session.user.email ?? "unknown";
 

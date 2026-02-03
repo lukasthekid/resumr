@@ -1,15 +1,8 @@
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
-import { z } from "zod";
 
 import { prisma } from "@/lib/prisma";
-
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
 
 export const {
   handlers: { GET, POST },
@@ -18,47 +11,61 @@ export const {
   signOut,
 } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "database",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   pages: {
-    signIn: "/",
+    signIn: "/login",
   },
   trustHost: true,
   providers: [
-    Credentials({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      authorize: async (credentials) => {
-        const parsed = credentialsSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-
-        const { email, password } = parsed.data;
-
-        const user = await prisma.user.findUnique({
-          where: { email },
-          select: { id: true, email: true, passwordHash: true },
-        });
-
-        if (!user?.email || !user.passwordHash) return null;
-
-        const ok = await bcrypt.compare(password, user.passwordHash);
-        if (!ok) return null;
-
-        return { id: String(user.id), email: user.email };
-      },
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user?.id) token.sub = String(user.id);
-      return token;
+    async signIn({ user, account }) {
+      // Handle Google OAuth
+      if (account?.provider === "google") {
+        const email = user?.email;
+        if (!email) return false;
+
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true },
+          });
+
+          if (!existingUser) {
+            await prisma.user.create({
+              data: {
+                email,
+                name: user.name ?? null,
+                image: user.image ?? null,
+                emailVerified: new Date(),
+              },
+            });
+          }
+
+          return true;
+        } catch (error) {
+          console.error("Error ensuring Google user exists:", error);
+          return false;
+        }
+      }
+
+      return false;
     },
-    session: async ({ session, token }) => {
-      if (session.user && token.sub) {
-        // NextAuth's Session.user.id is not always typed by default.
-        (session.user as { id?: string }).id = token.sub;
+    async session({ session, user }) {
+      // With database sessions, `user` comes from the User table via the Session relation
+      if (session.user && user) {
+        session.user.id = user.id;
+        session.user.name = user.name;
+        session.user.email = user.email;
+        session.user.image = user.image;
       }
       return session;
     },

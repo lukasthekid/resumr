@@ -29,7 +29,7 @@ export function CTASection() {
           </p>
 
           <Link
-            href="/signup"
+            href="/login"
             className="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-indigo-900 bg-white rounded-lg shadow-2xl hover:bg-indigo-50 transition-all duration-200 hover:scale-105"
           >
             Start Building Free

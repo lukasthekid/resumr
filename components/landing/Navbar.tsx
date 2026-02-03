@@ -54,19 +54,13 @@ export function Navbar() {
               </a>
             </div>
 
-            {/* Auth Buttons */}
-            <div className="flex items-center gap-3">
+            {/* Auth Button */}
+            <div className="flex items-center">
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
                 className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-lg shadow-indigo-500/50 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/60 transition-all"
               >
-                Sign Up
+                Get Started
               </Link>
             </div>
           </div>

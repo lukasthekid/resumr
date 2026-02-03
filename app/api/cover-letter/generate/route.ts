@@ -50,9 +50,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userIdRaw = (session.user as { id?: string }).id;
-  const userId = Number(userIdRaw);
-  if (!Number.isFinite(userId)) {
+  const userId = (session.user as { id?: string }).id;
+  if (!userId || typeof userId !== "string") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -78,9 +77,7 @@ export async function POST(req: Request) {
   }
 
   const user = await prisma.user.findUnique({
-    // Prisma client types may lag until you run `prisma generate` after schema changes.
-    // We keep the runtime value numeric and relax TS here.
-    where: { id: userId as any },
+    where: { id: userId },
     select: {
       id: true,
       email: true,
