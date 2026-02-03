@@ -16,11 +16,8 @@ export default function LoginPage() {
           <h1 className="text-4xl font-bold tracking-tight mb-3 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
             Welcome to Resumr
           </h1>
-          <p className="text-lg text-slate-300 mb-1">
-            Sign in with Google to get started
-          </p>
-          <p className="text-sm text-slate-400">
-            New users will automatically have an account created
+          <p className="text-lg text-slate-300">
+            Sign in with your Google account to continue
           </p>
         </div>
 
@@ -76,8 +73,7 @@ export default function LoginPage() {
                   Secure & Simple
                 </p>
                 <p>
-                  We use Google OAuth for secure authentication. No passwords to
-                  remember—just sign in with your Google account.
+                  Secure authentication powered by Google. No passwords needed.
                 </p>
               </div>
             </div>

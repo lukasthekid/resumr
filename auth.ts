@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-
 import { prisma } from "@/lib/prisma";
 
 export const {
@@ -27,37 +26,9 @@ export const {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      // Handle Google OAuth
-      if (account?.provider === "google") {
-        const email = user?.email;
-        if (!email) return false;
-
-        try {
-          const existingUser = await prisma.user.findUnique({
-            where: { email },
-            select: { id: true },
-          });
-
-          if (!existingUser) {
-            await prisma.user.create({
-              data: {
-                email,
-                name: user.name ?? null,
-                image: user.image ?? null,
-                emailVerified: new Date(),
-              },
-            });
-          }
-
-          return true;
-        } catch (error) {
-          console.error("Error ensuring Google user exists:", error);
-          return false;
-        }
-      }
-
-      return false;
+    async signIn({ account }) {
+      // Only allow Google OAuth sign-in
+      return account?.provider === "google";
     },
     async session({ session, user }) {
       // With database sessions, `user` comes from the User table via the Session relation
