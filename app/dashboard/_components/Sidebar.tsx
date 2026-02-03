@@ -62,7 +62,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
             </div>
             <div>
               <div className="text-base font-bold tracking-tight text-foreground">
-                Resumr
+                Resum<span className="text-indigo-600">r</span>
               </div>
               <div className="text-xs text-foreground-subtle">
                 AI-Powered Career Tools
