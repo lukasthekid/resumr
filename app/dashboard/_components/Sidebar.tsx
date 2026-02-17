@@ -55,11 +55,13 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
     <aside className="w-64 shrink-0 border-r border-border bg-surface">
       <div className="h-full px-4 py-6 flex flex-col">
         {/* Logo */}
-        <div className="px-2 mb-8">
+        <Link href="/dashboard" className="px-2 mb-8 block">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
-              <div className="h-4 w-4 rounded bg-white" />
-            </div>
+            <img
+              src="/Resumr.svg"
+              alt="Resumr"
+              className="h-10 w-10"
+            />
             <div>
               <div className="text-base font-bold tracking-tight text-foreground">
                 Resum<span className="text-indigo-600">r</span>
@@ -69,7 +71,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation */}
         <nav className="flex flex-col gap-1.5">

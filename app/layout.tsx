@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Resumr",
   description: "Sign up or log in to Resumr",
+  icons: {
+    icon: "/Resumr.svg",
+  },
 };
 
 export default function RootLayout({

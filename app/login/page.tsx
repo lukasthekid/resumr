@@ -8,7 +8,12 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="mb-10 text-center">
-          <Link href="/" className="inline-block mb-8">
+          <Link href="/" className="inline-flex items-center gap-3 mb-8">
+            <img
+              src="/Resumr.svg"
+              alt="Resumr"
+              className="h-12 w-12"
+            />
             <span className="text-4xl font-bold tracking-tight">
               Resum<span className="text-indigo-400">r</span>
             </span>

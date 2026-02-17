@@ -7,8 +7,15 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo and Copyright */}
           <div className="text-center md:text-left">
-            <div className="text-xl font-bold text-slate-900 mb-2">
-              Resum<span className="text-indigo-600">r</span>
+            <div className="flex items-center gap-2 mb-2">
+              <img
+                src="/Resumr.svg"
+                alt="Resumr"
+                className="h-6 w-6"
+              />
+              <span className="text-xl font-bold text-slate-900">
+                Resum<span className="text-indigo-600">r</span>
+              </span>
             </div>
             <p className="text-sm text-slate-500">
               © {new Date().getFullYear()} Resumr. All rights reserved.
