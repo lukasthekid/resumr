@@ -65,6 +65,9 @@ jobs:
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
+          # Groq
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+
           # Node Environment
           NODE_ENV=production
           
