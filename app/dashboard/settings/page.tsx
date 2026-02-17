@@ -11,7 +11,7 @@ const profileSchema = z.object({
     .trim()
     .max(120)
     .optional()
-    .transform((v) => (v && v.length > 0 ? v : null)),
+    .transform((v) => (v && v.length > 0 ? v : "")),
   phoneNumber: z
     .string()
     .trim()

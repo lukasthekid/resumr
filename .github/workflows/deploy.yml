@@ -65,6 +65,14 @@ jobs:
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
+          # GitHub
+          GIT_HUB_CLIENT_ID=${{ secrets.GIT_HUB_CLIENT_ID }}
+          GIT_HUB_CLIENT_SECRET=${{ secrets.GIT_HUB_CLIENT_SECRET }}
+
+          # LinkedIn
+          LINKEDIN_CLIENT_ID=${{ secrets.LINKEDIN_CLIENT_ID }}
+          LINKEDIN_CLIENT_SECRET=${{ secrets.LINKEDIN_CLIENT_SECRET }}
+
           # Groq
           GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
 

@@ -526,6 +526,10 @@ export type EnumApplicationStatusFieldUpdateOperationsInput = {
   set?: $Enums.ApplicationStatus
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type JobApplicationCreateWithoutUserInput = {
   status?: $Enums.ApplicationStatus
   notes?: string | null
