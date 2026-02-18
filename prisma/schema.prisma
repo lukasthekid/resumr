@@ -123,19 +123,20 @@ model Verification {
 }
 
 // This table is used outside Prisma (pgvector / embeddings). Schema matches the
-// current DB: bigserial id, text, vector(768), metadata. Kept in schema (ignored)
+// current DB: bigserial id, text, halfvec(3072), metadata. Kept in schema (ignored)
 // so `prisma migrate` won't try to delete it.
+// Indexes (managed via raw SQL migrations, not Prisma):
+//   - documents_embedding_idx: HNSW on embedding using halfvec_cosine_ops
+//   - idx_documents_metadata:  GIN on metadata
 model Document {
-  id        BigInt                        @id @default(autoincrement())
-  text      String                        @db.Text
-  embedding Unsupported("vector(768)")?
-  metadata  Json                          @default(dbgenerated("'{}'::jsonb")) @db.JsonB
-  createdAt DateTime?                     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime?                     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  id        BigInt                          @id @default(autoincrement())
+  text      String                          @db.Text
+  embedding Unsupported("halfvec(3072)")?
+  metadata  Json                            @default(dbgenerated("'{}'::jsonb")) @db.JsonB
+  createdAt DateTime?                       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime?                       @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("documents")
-  @@index([embedding], map: "documents_embedding_idx")
-  @@index([metadata], type: Gin, map: "idx_documents_metadata")
   @@ignore
 }
 
