@@ -1,6 +1,13 @@
 "use client";
 
-import { EditableField, RichEditor } from '@/components/resume';
+import {
+  AddListItemButton,
+  AddSectionButton,
+  EditableField,
+  EditableListItem,
+  EditableSectionItem,
+  RichEditor,
+} from '@/components/resume';
 import { useResumeStore } from '@/store';
 import { LinkIcon } from 'lucide-react';
 
@@ -31,6 +38,20 @@ export function ModernTemplate() {
   );
   const updateProject = useResumeStore((state) => state.updateProject);
   const updateProjectDescription = useResumeStore((state) => state.updateProjectDescription);
+  const addWorkExperienceAchievement = useResumeStore((state) => state.addWorkExperienceAchievement);
+  const removeWorkExperienceAchievement = useResumeStore(
+    (state) => state.removeWorkExperienceAchievement
+  );
+  const addEducationHighlight = useResumeStore((state) => state.addEducationHighlight);
+  const removeEducationHighlight = useResumeStore((state) => state.removeEducationHighlight);
+  const addProjectDescription = useResumeStore((state) => state.addProjectDescription);
+  const removeProjectDescription = useResumeStore((state) => state.removeProjectDescription);
+  const addWorkExperience = useResumeStore((state) => state.addWorkExperience);
+  const removeWorkExperience = useResumeStore((state) => state.removeWorkExperience);
+  const addEducation = useResumeStore((state) => state.addEducation);
+  const removeEducation = useResumeStore((state) => state.removeEducation);
+  const addProject = useResumeStore((state) => state.addProject);
+  const removeProject = useResumeStore((state) => state.removeProject);
 
   // Helper function to format URLs for display
   const formatUrl = (url: string): string => {
@@ -149,14 +170,17 @@ export function ModernTemplate() {
         {/* LEFT COLUMN - Contact & Skills */}
         <aside className="space-y-6">
           {/* EDUCATION */}
-          {education && education.length > 0 && (
-            <section>
-              <h2 className="text-xs font-bold uppercase tracking-widest border-b-2 border-gray-800 pb-1 mb-3 text-gray-900">
-                Education
-              </h2>
-              <div className="space-y-4">
-                {education.map((edu, idx) => (
-                  <div key={idx} className="text-xs">
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-widest border-b-2 border-gray-800 pb-1 mb-3 text-gray-900">
+              Education
+            </h2>
+            <div className="space-y-4">
+              {(education || []).map((edu, idx) => (
+                <EditableSectionItem
+                  key={idx}
+                  onRemove={() => removeEducation(idx)}
+                >
+                  <div className="text-xs">
                     <EditableField
                       value={edu.institution}
                       onChange={(value) => updateEducation(idx, 'institution', value)}
@@ -185,26 +209,27 @@ export function ModernTemplate() {
                       className="italic text-xs text-gray-700 leading-tight"
                       multiline
                     />
-                    {edu.highlights && edu.highlights.length > 0 && (
-                      <ul className="mt-2 space-y-1 text-xs">
-                        {edu.highlights.map((highlight, hIdx) => (
-                          <li key={hIdx} className="flex items-start gap-1">
-                            <span className="text-gray-400 mt-0.5">•</span>
-                            <RichEditor
-                              content={highlight}
-                              onChange={(html) => updateEducationHighlight(idx, hIdx, html)}
-                              placeholder="Highlight..."
-                              className="text-xs flex-1"
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <ul className="mt-2 space-y-1.5">
+                      {(edu.highlights || []).map((highlight, hIdx) => (
+                        <EditableListItem
+                          key={hIdx}
+                          content={highlight}
+                          onChange={(html) => updateEducationHighlight(idx, hIdx, html)}
+                          onRemove={() => removeEducationHighlight(idx, hIdx)}
+                          placeholder="Highlight..."
+                        />
+                      ))}
+                      <AddListItemButton
+                        onClick={() => addEducationHighlight(idx, '')}
+                        label="highlight"
+                      />
+                    </ul>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                </EditableSectionItem>
+              ))}
+              <AddSectionButton onClick={() => addEducation()} label="education" />
+            </div>
+          </section>
 
           {/* SKILLS */}
           {skills && Object.keys(skills).length > 0 && (
@@ -238,14 +263,14 @@ export function ModernTemplate() {
         {/* RIGHT COLUMN - Experience & Projects */}
         <main className="space-y-6">
           {/* WORK EXPERIENCE */}
-          {workExperience && workExperience.length > 0 && (
-            <section>
-              <h2 className="text-xs font-bold uppercase tracking-widest border-b-2 border-gray-800 pb-1 mb-3 text-gray-900">
-                Professional Experience
-              </h2>
-              <div className="space-y-5">
-                {workExperience.map((exp, idx) => (
-                  <div key={idx}>
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-widest border-b-2 border-gray-800 pb-1 mb-3 text-gray-900">
+              Professional Experience
+            </h2>
+            <div className="space-y-5">
+              {(workExperience || []).map((exp, idx) => (
+                <EditableSectionItem key={idx} onRemove={() => removeWorkExperience(idx)}>
+                  <div>
                     <div className="flex justify-between items-baseline mb-1">
                       <div className="flex-1">
                         <EditableField
@@ -285,40 +310,39 @@ export function ModernTemplate() {
                         </div>
                       </div>
                     </div>
-                    {exp.achievements && exp.achievements.length > 0 && (
-                      <ul className="mt-2 space-y-1.5">
-                        {exp.achievements.map((achievement, aIdx) => (
-                          <li key={aIdx} className="flex items-start gap-2 text-xs">
-                            <span className="text-gray-400 mt-1">•</span>
-                            <div className="flex-1">
-                              <RichEditor
-                                content={achievement}
-                                onChange={(html) =>
-                                  updateWorkExperienceAchievement(idx, aIdx, html)
-                                }
-                                placeholder="Describe your achievement with impact and metrics..."
-                                className="text-xs text-gray-700 leading-relaxed"
-                              />
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <ul className="mt-2 space-y-1.5">
+                      {(exp.achievements || []).map((achievement, aIdx) => (
+                        <EditableListItem
+                          key={aIdx}
+                          content={achievement}
+                          onChange={(html) =>
+                            updateWorkExperienceAchievement(idx, aIdx, html)
+                          }
+                          onRemove={() => removeWorkExperienceAchievement(idx, aIdx)}
+                          placeholder="Describe your achievement with impact and metrics..."
+                        />
+                      ))}
+                      <AddListItemButton
+                        onClick={() => addWorkExperienceAchievement(idx, '')}
+                        label="achievement"
+                      />
+                    </ul>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                </EditableSectionItem>
+              ))}
+              <AddSectionButton onClick={() => addWorkExperience()} label="work experience" />
+            </div>
+          </section>
 
           {/* PROJECTS */}
-          {projects && projects.length > 0 && (
-            <section>
-              <h2 className="text-xs font-bold uppercase tracking-widest border-b-2 border-gray-800 pb-1 mb-3 text-gray-900">
-                Projects
-              </h2>
-              <div className="space-y-4">
-                {projects.map((project, idx) => (
-                  <div key={idx}>
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-widest border-b-2 border-gray-800 pb-1 mb-3 text-gray-900">
+              Projects
+            </h2>
+            <div className="space-y-4">
+              {(projects || []).map((project, idx) => (
+                <EditableSectionItem key={idx} onRemove={() => removeProject(idx)}>
+                  <div>
                     <div className="flex justify-between items-start mb-1">
                       <div className="flex-1">
                         <EditableField
@@ -328,50 +352,45 @@ export function ModernTemplate() {
                           className="font-semibold text-sm text-gray-900"
                         />
                       </div>
-                      {project.role && (
-                        <div className="text-right text-xs ml-4 w-32">
-                          <EditableField
-                            value={project.role}
-                            onChange={(value) => updateProject(idx, 'role', value)}
-                            placeholder="Role"
-                            className="text-xs italic text-gray-600 text-right"
-                          />
-                        </div>
-                      )}
-                    </div>
-                    {project.url && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <LinkIcon className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                      <div className="text-right text-xs ml-4 w-32">
                         <EditableField
-                          value={project.url}
-                          onChange={(value) => updateProject(idx, 'url', value)}
-                          placeholder="project-url.com"
-                          className="text-xs text-blue-600 underline decoration-blue-200"
+                          value={project.role}
+                          onChange={(value) => updateProject(idx, 'role', value)}
+                          placeholder="Role"
+                          className="text-xs italic text-gray-600 text-right"
                         />
                       </div>
-                    )}
-                    {project.description && project.description.length > 0 && (
-                      <ul className="mt-2 space-y-1.5">
-                        {project.description.map((desc, dIdx) => (
-                          <li key={dIdx} className="flex items-start gap-2 text-xs">
-                            <span className="text-gray-400 mt-1">•</span>
-                            <div className="flex-1">
-                              <RichEditor
-                                content={desc}
-                                onChange={(html) => updateProjectDescription(idx, dIdx, html)}
-                                placeholder="Describe the project and your contributions..."
-                                className="text-xs text-gray-700 leading-relaxed"
-                              />
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-1">
+                      <LinkIcon className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                      <EditableField
+                        value={project.url}
+                        onChange={(value) => updateProject(idx, 'url', value)}
+                        placeholder="project-url.com"
+                        className="text-xs text-blue-600 underline decoration-blue-200"
+                      />
+                    </div>
+                    <ul className="mt-2 space-y-1.5">
+                      {(project.description || []).map((desc, dIdx) => (
+                        <EditableListItem
+                          key={dIdx}
+                          content={desc}
+                          onChange={(html) => updateProjectDescription(idx, dIdx, html)}
+                          onRemove={() => removeProjectDescription(idx, dIdx)}
+                          placeholder="Describe the project and your contributions..."
+                        />
+                      ))}
+                      <AddListItemButton
+                        onClick={() => addProjectDescription(idx, '')}
+                        label="description"
+                      />
+                    </ul>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                </EditableSectionItem>
+              ))}
+              <AddSectionButton onClick={() => addProject()} label="project" />
+            </div>
+          </section>
         </main>
       </div>
     </div>
