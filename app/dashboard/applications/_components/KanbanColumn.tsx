@@ -44,7 +44,7 @@ export function KanbanColumn({
   return (
     <div
       className={[
-        "flex flex-col min-w-[240px] flex-1 rounded-xl",
+        "flex flex-col min-w-[200px] sm:min-w-[240px] flex-1 rounded-xl snap-start shrink-0",
         highlighted
           ? stage.color.dropHighlight
           : "bg-slate-50/70",

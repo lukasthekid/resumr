@@ -162,7 +162,7 @@ export default async function SettingsPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column (col-span-2) - Profile Information */}
         <div className="lg:col-span-2">
-          <div className="bg-surface rounded-xl shadow-sm border border-border p-8">
+          <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
             <div className="mb-6">
               <h2 className="text-xl font-bold text-foreground">Personal Details</h2>
               <p className="text-sm text-foreground-muted mt-1">
@@ -292,7 +292,7 @@ export default async function SettingsPage({
 
         {/* Right Column (col-span-1) - Document Upload */}
         <div className="lg:col-span-1">
-          <div className="bg-surface rounded-xl shadow-sm border border-border p-6">
+          <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-6">
             <div className="mb-6">
               <h2 className="text-xl font-bold text-foreground">Document Management</h2>
               <p className="text-sm text-foreground-muted mt-1">

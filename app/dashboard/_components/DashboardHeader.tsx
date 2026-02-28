@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, Menu } from "lucide-react";
+import { useDashboardSidebar } from "../_context/DashboardSidebarContext";
 
 interface PageInfo {
   title: string;
@@ -118,12 +119,25 @@ function getPageInfo(pathname: string): PageInfo {
 export function DashboardHeader() {
   const pathname = usePathname();
   const { title, breadcrumbs } = getPageInfo(pathname);
+  const { toggleMobile } = useDashboardSidebar();
 
   return (
     <header className="bg-surface border-b border-border">
-      <div className="px-8 py-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+        <div className="flex items-start gap-3">
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            onClick={toggleMobile}
+            className="lg:hidden p-2 -ml-2 rounded-lg text-foreground-muted hover:bg-slate-100 hover:text-foreground transition-colors shrink-0"
+            aria-label="Open menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <div className="min-w-0 flex-1">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm mb-2">
+        <nav className="flex items-center gap-2 text-sm mb-2 flex-wrap min-w-0">
           <Link
             href="/dashboard"
             className="text-foreground-muted hover:text-foreground transition-colors"
@@ -150,9 +164,11 @@ export function DashboardHeader() {
         </nav>
 
         {/* Page Title */}
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
           {title}
         </h1>
+          </div>
+        </div>
       </div>
     </header>
   );

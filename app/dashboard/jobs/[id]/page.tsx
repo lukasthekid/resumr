@@ -45,7 +45,7 @@ export default async function JobDetailPage({
       {/* Job Header - Full Width */}
       <header className="bg-surface border-b border-border mb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-start justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
             {/* Left Side - Logo & Info */}
             <div className="flex items-start gap-4 flex-1 min-w-0">
               {/* Company Logo */}
@@ -63,7 +63,7 @@ export default async function JobDetailPage({
 
               {/* Job Info */}
               <div className="min-w-0 flex-1">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">
                   {job.jobTitle || "Job listing"}
                 </h1>
                 <div className="flex flex-wrap items-center gap-2 text-sm text-foreground-muted">

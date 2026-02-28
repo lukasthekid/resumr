@@ -129,9 +129,9 @@ export default function CoverLetterEditorPage() {
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Fixed Header Bar */}
-      <div className="border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10 print:hidden shadow-sm">
+      <div className="border-b border-slate-200 bg-white px-4 sm:px-6 py-4 sticky top-0 z-10 print:hidden shadow-sm">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <Link
               href={`/dashboard/jobs/${jobId}`}
               className="text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-2"
@@ -140,7 +140,7 @@ export default function CoverLetterEditorPage() {
               <span>Back to job</span>
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end sm:justify-start">
               {/* Keyboard Shortcuts Hint */}
               <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg">
                 <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
@@ -208,8 +208,8 @@ export default function CoverLetterEditorPage() {
       </div>
 
       {/* Document Container */}
-      <div className="py-8 print:py-0">
-        <div className="max-w-5xl mx-auto px-6 print:px-0">
+      <div className="py-6 sm:py-8 print:py-0">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 print:px-0">
           {/* Instructions */}
           <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 print:hidden">
             <p>

@@ -50,7 +50,7 @@ export default async function DashboardHome() {
       <div className="space-y-8">
         {/* Welcome Header */}
         <header className="space-y-3">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
             Welcome to Resumr, {firstName}
           </h1>
           <p className="text-lg text-foreground-muted">
@@ -63,7 +63,7 @@ export default async function DashboardHome() {
           {/* Main Column (col-span-2) - Progress + Action Cards */}
           <div className="lg:col-span-2 space-y-6">
             {/* Progress Card */}
-            <div className="bg-gradient-to-br from-primary to-primary-hover rounded-xl p-6 shadow-lg text-white">
+            <div className="bg-gradient-to-br from-primary to-primary-hover rounded-xl p-4 sm:p-6 shadow-lg text-white">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-2xl font-bold">Getting Started</h2>
@@ -82,7 +82,7 @@ export default async function DashboardHome() {
             </div>
 
             {/* Action Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Card 1 - Active: Upload Base Resume */}
           <div className="bg-surface rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 border-2 border-primary relative">
             <div className="absolute -top-3 -right-3 bg-secondary text-white rounded-full p-2 shadow-lg">
@@ -263,7 +263,7 @@ export default async function DashboardHome() {
         {/* Left Column (col-span-2) - Job Import Engine */}
         <div className="lg:col-span-2 space-y-5">
           {/* Job Import Card */}
-          <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+          <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-5">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-foreground">New Application</h2>
               <p className="text-sm text-foreground-muted mt-1">
@@ -275,7 +275,7 @@ export default async function DashboardHome() {
           </div>
 
           {/* Recent Applications - Empty State */}
-          <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+          <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-5">
             <div className="mb-3 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold text-foreground">Recent Applications</h3>

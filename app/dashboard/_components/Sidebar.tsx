@@ -13,35 +13,39 @@ import {
 } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
+import { useDashboardSidebar } from "../_context/DashboardSidebarContext";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 function NavLink({
   href,
   icon: Icon,
   label,
-  collapsed,
+  expanded,
 }: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   label: string;
-  collapsed: boolean;
+  expanded: boolean;
 }) {
   const pathname = usePathname();
+  const { setMobileOpen } = useDashboardSidebar();
   const active = pathname === href;
 
   return (
     <Link
       href={href}
-      title={collapsed ? label : undefined}
+      title={!expanded ? label : undefined}
+      onClick={() => setMobileOpen(false)}
       className={[
         "flex items-center rounded-lg text-sm font-medium transition-all duration-200",
-        collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-4 py-2.5",
+        expanded ? "gap-3 px-4 py-2.5" : "justify-center px-2 py-2.5",
         active
           ? "bg-primary text-white shadow-sm"
           : "text-foreground-muted hover:bg-slate-50 hover:text-foreground",
       ].join(" ")}
     >
       <Icon className="h-4 w-4 shrink-0" />
-      {!collapsed && <span className="truncate">{label}</span>}
+      {expanded && <span className="truncate">{label}</span>}
     </Link>
   );
 }
@@ -53,6 +57,9 @@ interface SidebarProps {
 
 export function Sidebar({ userEmail, userName }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const { isMobileOpen, setMobileOpen } = useDashboardSidebar();
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const expanded = !collapsed || !isDesktop;
 
   const userInitials = userName
     .split(" ")
@@ -62,23 +69,38 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
     .slice(0, 2);
 
   return (
-    <aside
-      className={[
-        "shrink-0 border-r border-border bg-surface flex flex-col",
-        "transition-all duration-300 ease-in-out",
-        collapsed ? "w-16" : "w-64",
-      ].join(" ")}
-    >
+    <>
+      {/* Mobile backdrop */}
+      <div
+        className={[
+          "fixed inset-0 bg-black/20 z-40 transition-opacity duration-300 lg:hidden",
+          isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none",
+        ].join(" ")}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
+
+      <aside
+        className={[
+          "shrink-0 border-r border-border bg-surface flex flex-col",
+          "transition-all duration-300 ease-in-out",
+          /* Mobile: fixed drawer */
+          "fixed inset-y-0 left-0 z-50 w-64 lg:relative lg:inset-auto lg:z-auto",
+          isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          /* Desktop width */
+          collapsed ? "lg:w-16" : "lg:w-64",
+        ].join(" ")}
+      >
       <div className="h-full px-3 py-6 flex flex-col overflow-hidden">
 
         {/* Logo + Toggle Row */}
         <div
           className={[
             "flex items-center mb-8",
-            collapsed ? "justify-center" : "justify-between px-1",
+            expanded ? "justify-between px-1" : "justify-center",
           ].join(" ")}
         >
-          {!collapsed && (
+          {expanded && (
             <Link href="/dashboard" className="flex items-center gap-3 min-w-0">
               <img src="/Resumr.svg" alt="Resumr" className="h-10 w-10 shrink-0" />
               <div className="min-w-0">
@@ -92,7 +114,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
             </Link>
           )}
 
-          {collapsed && (
+          {!expanded && (
             <Link href="/dashboard" title="Dashboard">
               <img src="/Resumr.svg" alt="Resumr" className="h-8 w-8" />
             </Link>
@@ -104,20 +126,20 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className={[
               "rounded-lg p-1.5 text-foreground-subtle hover:bg-slate-100 hover:text-foreground transition-colors",
-              collapsed ? "hidden" : "ml-1 shrink-0",
+              collapsed ? "hidden" : "hidden lg:block ml-1 shrink-0",
             ].join(" ")}
           >
             <PanelLeftClose className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Collapse toggle when collapsed — sits at top */}
-        {collapsed && (
+        {/* Collapse toggle when collapsed — sits at top (desktop only) */}
+        {!expanded && isDesktop && (
           <button
             type="button"
             onClick={() => setCollapsed(false)}
             title="Expand sidebar"
-            className="mb-4 mx-auto flex items-center justify-center rounded-lg p-1.5 text-foreground-subtle hover:bg-slate-100 hover:text-foreground transition-colors"
+            className="mb-4 mx-auto flex items-center justify-center rounded-lg p-1.5 text-foreground-subtle hover:bg-slate-100 hover:text-foreground transition-colors hidden lg:flex"
           >
             <PanelLeftOpen className="h-4 w-4" />
           </button>
@@ -129,25 +151,25 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
             href="/dashboard"
             icon={LayoutDashboard}
             label="Dashboard"
-            collapsed={collapsed}
+            expanded={expanded}
           />
           <NavLink
             href="/dashboard/applications"
             icon={Briefcase}
             label="Applications"
-            collapsed={collapsed}
+            expanded={expanded}
           />
           <NavLink
             href="/dashboard/settings"
             icon={Settings}
             label="Settings"
-            collapsed={collapsed}
+            expanded={expanded}
           />
         </nav>
 
         {/* User Profile — Bottom */}
         <div className="mt-auto pt-6 border-t border-border">
-          {collapsed ? (
+          {!expanded ? (
             <div className="flex flex-col items-center gap-2">
               <div
                 title={userName}
@@ -198,5 +220,6 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
         </div>
       </div>
     </aside>
+    </>
   );
 }

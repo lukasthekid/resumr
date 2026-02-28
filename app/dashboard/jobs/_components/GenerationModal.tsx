@@ -48,13 +48,13 @@ export function GenerationModal({
       />
 
       {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className="flex min-h-full items-center justify-center p-3 sm:p-4">
         <div
-          className="relative bg-surface rounded-xl shadow-2xl w-full max-w-2xl border border-border"
+          className="relative bg-surface rounded-xl shadow-2xl w-full max-w-2xl max-h-[90dvh] flex flex-col border border-border"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="relative p-6 pb-5">
+          <div className="relative p-6 pb-5 shrink-0">
             {documentType ? (
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white">
@@ -82,7 +82,7 @@ export function GenerationModal({
           </div>
 
           {/* Content */}
-          <div className="px-6 pb-6">{children}</div>
+          <div className="px-4 sm:px-6 pb-6 overflow-y-auto flex-1 min-h-0">{children}</div>
         </div>
       </div>
     </div>

@@ -57,7 +57,7 @@ export function CoverLetterLayout_Classic() {
               value={user.name || ""}
               onChange={(value) => updateUser("name", value)}
               placeholder="YOUR NAME"
-              className="text-4xl font-bold uppercase tracking-wide text-gray-900 text-center"
+              className="text-2xl sm:text-4xl font-bold uppercase tracking-wide text-gray-900 text-center"
             />
           </div>
 
@@ -83,7 +83,7 @@ export function CoverLetterLayout_Classic() {
         </header>
 
         {/* RECIPIENT & DATE SECTION */}
-        <div className="flex justify-between items-start mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0 mb-8">
           {/* Left Side - Recipient */}
           <div className="flex-1">
             <div className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-1">

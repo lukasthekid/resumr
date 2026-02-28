@@ -165,8 +165,8 @@ export function ModernTemplate() {
         </div>
       </header>
 
-      {/* TWO COLUMN LAYOUT */}
-      <div className="grid grid-cols-[30%_70%] gap-6">
+      {/* TWO COLUMN LAYOUT - Stacks on mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-[30%_70%] gap-6">
         {/* LEFT COLUMN - Contact & Skills */}
         <aside className="space-y-6">
           {/* EDUCATION */}

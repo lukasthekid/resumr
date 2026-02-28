@@ -14,7 +14,7 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
   return (
     <div className="space-y-4">
       {/* Ready to Apply Card */}
-      <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+      <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-5">
         <div className="flex items-start justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-foreground">Ready to Apply</h2>
@@ -121,7 +121,7 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
       </div>
 
       {/* Tips Card */}
-      <div className="bg-surface rounded-xl shadow-sm border border-border p-5">
+      <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-5">
         <h3 className="text-sm font-bold text-foreground mb-2">
           💡 Pro Tips
         </h3>

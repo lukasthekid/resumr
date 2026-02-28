@@ -15,13 +15,15 @@ interface A4PageProps {
 export function A4Page({ children, className = '' }: A4PageProps) {
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:py-0 print:bg-white">
-      <div className="mx-auto px-6 print:px-0">
+      <div className="mx-auto max-w-full px-4 sm:px-6 print:px-0">
         <div
           className={`
             mx-auto
+            max-w-full
             bg-white
             shadow-lg
             print:shadow-none
+            print:max-w-none
             ${className}
           `}
           style={{

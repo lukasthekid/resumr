@@ -220,9 +220,9 @@ export default function ResumeViewerPage() {
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Fixed Header Bar */}
-      <div className="border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10 print:hidden shadow-sm">
+      <div className="border-b border-slate-200 bg-white px-4 sm:px-6 py-4 sticky top-0 z-10 print:hidden shadow-sm">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <Link
               href={`/dashboard/jobs/${jobId}`}
               className="text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-2"
@@ -231,7 +231,7 @@ export default function ResumeViewerPage() {
               <span>Back to job</span>
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {/* Layout Selector */}
               <div className="flex items-center gap-2">
                 <label className="text-xs text-slate-600 font-medium">Layout:</label>
@@ -312,8 +312,8 @@ export default function ResumeViewerPage() {
       </div>
 
       {/* Document Container */}
-      <div className="py-8 print:py-0">
-        <div className="max-w-5xl mx-auto px-6 print:px-0">
+      <div className="py-6 sm:py-8 print:py-0">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 print:px-0">
           {/* Instructions */}
           <div className="mb-6 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 print:hidden">
             <p>
@@ -324,9 +324,11 @@ export default function ResumeViewerPage() {
           </div>
 
           {/* A4 Resume Document with Selected Template */}
+          <div className="overflow-x-auto -mx-4 sm:mx-0 print:mx-0">
           <A4Page>
             {layout === "modern" ? <ModernTemplate /> : <ClassicTemplate />}
           </A4Page>
+          </div>
 
           {/* Tips */}
           <div className="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm p-4 text-sm text-slate-700 print:hidden">
