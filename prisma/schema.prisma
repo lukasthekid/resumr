@@ -51,33 +51,31 @@ model JobListing {
   @@index([url])
 }
 
-enum ApplicationStatus {
-  SAVED
-  APPLIED
-  INTERVIEWING
-  OFFER
-  ACCEPTED
-  REJECTED
-  WITHDRAWN
+enum ApplicationStage {
+  applied
+  interviewing
+  final_round
+  offer
+  rejected
 }
 
 model JobApplication {
-  id          Int               @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   userId      String
   jobId       Int
-  status      ApplicationStatus @default(SAVED)
-  notes       String?           @db.Text
+  stage       ApplicationStage @default(applied)
+  notes       String?          @db.Text
 
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job         JobListing        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         JobListing       @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   appliedAt   DateTime?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   @@unique([userId, jobId])
   @@index([userId])
-  @@index([status])
+  @@index([stage])
 }
 
 model Account {

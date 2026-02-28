@@ -9,14 +9,12 @@
 * 🟢 You can import this file directly.
 */
 
-export const ApplicationStatus = {
-  SAVED: 'SAVED',
-  APPLIED: 'APPLIED',
-  INTERVIEWING: 'INTERVIEWING',
-  OFFER: 'OFFER',
-  ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED',
-  WITHDRAWN: 'WITHDRAWN'
+export const ApplicationStage = {
+  applied: 'applied',
+  interviewing: 'interviewing',
+  final_round: 'final_round',
+  offer: 'offer',
+  rejected: 'rejected'
 } as const
 
-export type ApplicationStatus = (typeof ApplicationStatus)[keyof typeof ApplicationStatus]
+export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]

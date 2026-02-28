@@ -77,7 +77,8 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         jobId: jobListing.id,
-        status: "SAVED",
+        stage: "applied",
+        appliedAt: new Date(),
       },
     });
 

@@ -123,7 +123,7 @@ export default async function SettingsPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Success Alert */}
       {saved && (
         <div className="rounded-xl border border-secondary/20 bg-secondary/5 px-5 py-4 flex items-start gap-3">

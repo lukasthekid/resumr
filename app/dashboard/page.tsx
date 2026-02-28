@@ -257,7 +257,7 @@ export default async function DashboardHome() {
   });
 
   return (
-    <div className="space-y-5">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-5">
       {/* Two-Column Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left Column (col-span-2) - Job Import Engine */}
@@ -353,7 +353,7 @@ export default async function DashboardHome() {
                               </p>
                             </td>
                             <td className="px-4 py-3">
-                              <ApplicationStatusBadge status={app.status} />
+                              <ApplicationStatusBadge status={app.stage} />
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600">
                               {app.appliedAt

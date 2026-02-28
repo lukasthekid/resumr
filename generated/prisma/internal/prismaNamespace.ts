@@ -933,7 +933,7 @@ export const JobApplicationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   jobId: 'jobId',
-  status: 'status',
+  stage: 'stage',
   notes: 'notes',
   appliedAt: 'appliedAt',
   createdAt: 'createdAt',
@@ -1068,16 +1068,16 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'ApplicationStatus'
+ * Reference to a field of type 'ApplicationStage'
  */
-export type EnumApplicationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStatus'>
+export type EnumApplicationStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStage'>
     
 
 
 /**
- * Reference to a field of type 'ApplicationStatus[]'
+ * Reference to a field of type 'ApplicationStage[]'
  */
-export type ListEnumApplicationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStatus[]'>
+export type ListEnumApplicationStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStage[]'>
     
 
 

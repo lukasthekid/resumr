@@ -4,18 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ApplicationStatusBadge } from "@/components/ApplicationStatusBadge";
 
-type ApplicationStatus =
-  | "SAVED"
-  | "APPLIED"
-  | "INTERVIEWING"
-  | "OFFER"
-  | "ACCEPTED"
-  | "REJECTED"
-  | "WITHDRAWN";
+type ApplicationStage =
+  | "applied"
+  | "interviewing"
+  | "final_round"
+  | "offer"
+  | "rejected";
 
 type Application = {
   id: number;
-  status: ApplicationStatus;
+  stage: ApplicationStage;
   notes: string | null;
   appliedAt: string | null;
   createdAt: string;
@@ -55,7 +53,7 @@ export function JobApplicationTracker({ jobId }: { jobId: number }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           jobId,
-          status: "APPLIED",
+          stage: "applied",
           notes: "",
         }),
       });
@@ -83,7 +81,7 @@ export function JobApplicationTracker({ jobId }: { jobId: number }) {
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-slate-700">Status:</span>
           {application ? (
-            <ApplicationStatusBadge status={application.status} />
+            <ApplicationStatusBadge status={application.stage} />
           ) : (
             <span className="text-sm text-slate-500">Not tracked</span>
           )}

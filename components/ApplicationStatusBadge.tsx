@@ -1,45 +1,35 @@
 "use client";
 
-type ApplicationStatus =
-  | "SAVED"
-  | "APPLIED"
-  | "INTERVIEWING"
-  | "OFFER"
-  | "ACCEPTED"
-  | "REJECTED"
-  | "WITHDRAWN";
+type ApplicationStage =
+  | "applied"
+  | "interviewing"
+  | "final_round"
+  | "offer"
+  | "rejected";
 
-const STATUS_CONFIG: Record<
-  ApplicationStatus,
+const STAGE_CONFIG: Record<
+  ApplicationStage,
   { label: string; className: string }
 > = {
-  SAVED: {
-    label: "Saved",
-    className: "bg-slate-100 text-slate-700 ring-slate-200",
-  },
-  APPLIED: {
+  applied: {
     label: "Applied",
-    className: "bg-sky-50 text-sky-700 ring-sky-200",
+    className: "bg-blue-50 text-blue-700 ring-blue-200",
   },
-  INTERVIEWING: {
+  interviewing: {
     label: "Interviewing",
-    className: "bg-purple-50 text-purple-700 ring-purple-200",
+    className: "bg-violet-50 text-violet-700 ring-violet-200",
   },
-  OFFER: {
+  final_round: {
+    label: "Final Round",
+    className: "bg-amber-50 text-amber-700 ring-amber-200",
+  },
+  offer: {
     label: "Offer",
-    className: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  },
-  ACCEPTED: {
-    label: "Accepted",
     className: "bg-green-50 text-green-700 ring-green-200",
   },
-  REJECTED: {
+  rejected: {
     label: "Rejected",
-    className: "bg-rose-50 text-rose-700 ring-rose-200",
-  },
-  WITHDRAWN: {
-    label: "Withdrawn",
-    className: "bg-orange-50 text-orange-700 ring-orange-200",
+    className: "bg-slate-100 text-slate-600 ring-slate-200",
   },
 };
 
@@ -47,13 +37,13 @@ export function ApplicationStatusBadge({
   status,
   className,
 }: {
-  status?: ApplicationStatus | string | null;
+  status?: ApplicationStage | string | null;
   className?: string;
 }) {
   if (!status) return null;
 
   const config =
-    STATUS_CONFIG[status as ApplicationStatus] ?? STATUS_CONFIG.SAVED;
+    STAGE_CONFIG[status as ApplicationStage] ?? STAGE_CONFIG.applied;
 
   return (
     <span

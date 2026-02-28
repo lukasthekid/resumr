@@ -1,22 +1,18 @@
 "use client";
 
-type ApplicationStatus =
-  | "SAVED"
-  | "APPLIED"
-  | "INTERVIEWING"
-  | "OFFER"
-  | "ACCEPTED"
-  | "REJECTED"
-  | "WITHDRAWN";
+type ApplicationStage =
+  | "applied"
+  | "interviewing"
+  | "final_round"
+  | "offer"
+  | "rejected";
 
-const STATUSES: Array<{ value: ApplicationStatus; label: string }> = [
-  { value: "SAVED", label: "Saved" },
-  { value: "APPLIED", label: "Applied" },
-  { value: "INTERVIEWING", label: "Interviewing" },
-  { value: "OFFER", label: "Offer" },
-  { value: "ACCEPTED", label: "Accepted" },
-  { value: "REJECTED", label: "Rejected" },
-  { value: "WITHDRAWN", label: "Withdrawn" },
+const STAGES: Array<{ value: ApplicationStage; label: string }> = [
+  { value: "applied", label: "Applied" },
+  { value: "interviewing", label: "Interviewing" },
+  { value: "final_round", label: "Final Round" },
+  { value: "offer", label: "Offer" },
+  { value: "rejected", label: "Rejected" },
 ];
 
 export function ApplicationStatusSelector({
@@ -24,18 +20,18 @@ export function ApplicationStatusSelector({
   onChange,
   disabled,
 }: {
-  value?: ApplicationStatus | string;
-  onChange?: (status: ApplicationStatus) => void;
+  value?: ApplicationStage | string;
+  onChange?: (stage: ApplicationStage) => void;
   disabled?: boolean;
 }) {
   return (
     <select
-      value={value ?? "SAVED"}
-      onChange={(e) => onChange?.(e.target.value as ApplicationStatus)}
+      value={value ?? "applied"}
+      onChange={(e) => onChange?.(e.target.value as ApplicationStage)}
       disabled={disabled}
-      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-transparent disabled:opacity-60"
+      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-transparent disabled:opacity-60"
     >
-      {STATUSES.map((s) => (
+      {STAGES.map((s) => (
         <option key={s.value} value={s.value}>
           {s.label}
         </option>
