@@ -4,3 +4,8 @@ export { FeatureSection } from "./FeatureSection";
 export { Navbar } from "./Navbar";
 export { CTASection } from "./CTASection";
 export { Footer } from "./Footer";
+export { default as SplineWrapper } from "./SplineWrapper";
+export { ProblemSolution } from "./ProblemSolution";
+export { HowItWorks } from "./HowItWorks";
+export { Testimonials } from "./Testimonials";
+export { PricingSection } from "./PricingSection";

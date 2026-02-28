@@ -17,6 +17,8 @@
     "@floating-ui/dom": "^1.7.5",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.61",
     "@tiptap/extension-placeholder": "^3.18.0",
     "@tiptap/extension-underline": "^3.18.0",
     "@tiptap/react": "^3.18.0",
