@@ -6,13 +6,27 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import SplineWrapper from "./SplineWrapper";
 
 // Placeholder Spline scene - replace with your own exported scene URL
-const SPLINE_SCENE_URL = "https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"; 
+const SPLINE_SCENE_URL = "https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode";
+// Full-width flowing ribbon background
+const SPLINE_BACKGROUND_URL = "https://prod.spline.design/tcvbvwJIqt7pvN68/scene.splinecode";
 
 export function HeroSection() {
   return (
     <section className="relative min-h-screen pt-20 overflow-hidden bg-slate-50 flex items-center">
+      {/* Full-width Spline background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <SplineWrapper
+          scene={SPLINE_BACKGROUND_URL}
+          className="w-full h-full"
+        />
+      </div>
+      {/* Frosted glass overlay - diffuses Spline for better text readability */}
+      <div 
+        className="absolute inset-0 z-[0.5] pointer-events-none backdrop-blur-3xl"
+        aria-hidden
+      />
       {/* Background Gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-[1]">
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
         <div className="absolute top-40 right-40 w-[400px] h-[400px] bg-sky-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
         <div className="absolute -bottom-20 left-20 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-4000" />
