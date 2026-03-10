@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCoverLetterStore } from "@/store";
 import { CoverLetterLayout_Classic } from "./CoverLetterLayout_Classic";
+import { CoverLetterLayout_Modern } from "./CoverLetterLayout_Modern";
 import type { CoverLetterData } from "@/types/coverLetter";
 
 export default function CoverLetterEditorPage() {
@@ -15,6 +16,7 @@ export default function CoverLetterEditorPage() {
 
   const [loading, setLoading] = useState(true);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [layout, setLayout] = useState<"classic" | "modern">("classic");
 
   // Get store state and actions
   const coverLetterData = useCoverLetterStore((state) => state.coverLetterData);
@@ -88,6 +90,7 @@ export default function CoverLetterEditorPage() {
           job: coverLetterData.job,
           todayDate: coverLetterData.date,
           bodyHtml: coverLetterData.bodyHtml,
+          layout,
         }),
       });
 
@@ -140,7 +143,19 @@ export default function CoverLetterEditorPage() {
               <span>Back to job</span>
             </Link>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-end sm:justify-start">
+            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end sm:justify-start">
+              {/* Layout Selector */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-slate-600 font-medium">Layout:</label>
+                <select
+                  value={layout}
+                  onChange={(e) => setLayout(e.target.value as "classic" | "modern")}
+                  className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-700 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                >
+                  <option value="classic">Classic</option>
+                  <option value="modern">Modern</option>
+                </select>
+              </div>
               {/* Keyboard Shortcuts Hint */}
               <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg">
                 <kbd className="bg-white px-2 py-1 rounded border border-slate-200 font-mono text-xs">
@@ -227,7 +242,7 @@ export default function CoverLetterEditorPage() {
           </div>
 
           {/* Cover Letter Document */}
-          <CoverLetterLayout_Classic />
+          {layout === "classic" ? <CoverLetterLayout_Classic /> : <CoverLetterLayout_Modern />}
 
           {/* Tips */}
           <div className="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm p-4 text-sm text-slate-700 print:hidden">

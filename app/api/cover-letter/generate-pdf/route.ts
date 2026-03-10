@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 import type { CoverLetterUser, CoverLetterJob } from "@/types/coverLetter";
 
+const MODERN_ACCENT = "#059669";
+
 type PDFRequest = {
   user: CoverLetterUser;
   job: CoverLetterJob;
   todayDate: string;
   bodyHtml: string;
+  layout?: "classic" | "modern";
 };
 
 // Helper function to generate Classic layout HTML
@@ -189,10 +192,125 @@ function generateClassicHTML(
   `;
 }
 
+function generateModernHTML(
+  user: PDFRequest["user"],
+  job: PDFRequest["job"],
+  todayDate: string,
+  bodyHtml: string
+): string {
+  const contactItems = [user.email, user.phoneNumber, user.streetAddress].filter(Boolean);
+  const userContactLine = contactItems.join(" • ");
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          @page { size: A4; margin: 0; }
+          body {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            padding: 25.4mm;
+            font-family: Arial, Calibri, sans-serif;
+            font-size: 11pt;
+            line-height: 1.3;
+            color: #000;
+            background: white;
+          }
+          .header {
+            margin-bottom: 1.5em;
+            padding-bottom: 0.75em;
+            border-bottom: 2px solid ${MODERN_ACCENT};
+            text-align: left;
+          }
+          .user-name {
+            font-weight: 700;
+            font-size: 20pt;
+            margin-bottom: 0.25em;
+            color: #111827;
+          }
+          .user-contact {
+            font-size: 9pt;
+            color: #4b5563;
+          }
+          .metadata-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5em;
+          }
+          .recipient { flex: 1; }
+          .recipient-label {
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #9ca3af;
+            font-weight: 700;
+            margin-bottom: 0.25em;
+          }
+          .company-name {
+            font-weight: 700;
+            font-size: 10.5pt;
+            color: #111827;
+            margin-bottom: 0.25em;
+          }
+          .company-location { font-size: 9pt; color: #4b5563; }
+          .date {
+            text-align: right;
+            font-size: 10.5pt;
+            font-weight: 500;
+            color: #111827;
+          }
+          .subject-line {
+            padding-bottom: 0.5em;
+            border-bottom: 1px solid ${MODERN_ACCENT};
+            margin-bottom: 1.5em;
+            font-size: 10.5pt;
+            font-weight: 500;
+            color: #111827;
+          }
+          .subject-line .re { color: #6b7280; }
+          .body p { margin-bottom: 1em; text-align: left; }
+          .body p:last-child { margin-bottom: 0; }
+          .body strong { font-weight: 600; }
+          .body em { font-style: italic; }
+          .body u { text-decoration: underline; }
+          .body ul { margin-left: 1.5em; margin-bottom: 1em; list-style-type: disc; }
+          .body ol { margin-left: 1.5em; margin-bottom: 1em; list-style-type: decimal; }
+          .body li { margin-bottom: 0.25em; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="user-name">${user.name || "Your Name"}</div>
+          <div class="user-contact">${userContactLine}</div>
+        </div>
+        <div class="metadata-section">
+          <div class="recipient">
+            <div class="recipient-label">TO:</div>
+            <div class="company-name">${job.companyName}</div>
+            ${job.locationCity || job.country ? `<div class="company-location">${[job.locationCity, job.country].filter(Boolean).join(", ")}</div>` : ""}
+          </div>
+          <div class="date">${todayDate}</div>
+        </div>
+        <div class="subject-line">
+          <span class="re">Re:</span> ${job.jobTitle}
+        </div>
+        <div class="body">
+          ${bodyHtml}
+        </div>
+      </body>
+    </html>
+  `;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body: PDFRequest = await req.json();
-    const { user, job, todayDate, bodyHtml } = body;
+    const { user, job, todayDate, bodyHtml, layout = "classic" } = body;
 
     if (!user || !job || !bodyHtml) {
       return NextResponse.json(
@@ -201,8 +319,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate the HTML
-    const html = generateClassicHTML(user, job, todayDate, bodyHtml);
+    const html =
+      layout === "modern"
+        ? generateModernHTML(user, job, todayDate, bodyHtml)
+        : generateClassicHTML(user, job, todayDate, bodyHtml);
 
     // Launch Puppeteer with appropriate settings
     const browser = await puppeteer.launch({
