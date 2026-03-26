@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import {
+  consumeResumeGeneration,
+  FREE_RESUME_CAP,
+  hasProAccess,
+  QUOTA_ERROR_CODE,
+} from "@/lib/billing/limits";
 import { prisma } from "@/lib/prisma";
 import type { ResumeData } from "@/types/resume";
 
@@ -95,8 +101,26 @@ export async function POST(req: Request) {
       linkedInUrl: true,
       createdAt: true,
       updatedAt: true,
+      plan: true,
+      stripeSubscriptionStatus: true,
+      resumeGenerationsUsed: true,
     },
   });
+
+  if (
+    user &&
+    !hasProAccess(user.plan, user.stripeSubscriptionStatus) &&
+    user.resumeGenerationsUsed >= FREE_RESUME_CAP
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: `Free plan includes ${FREE_RESUME_CAP} resume generations. Upgrade to Pro for unlimited.`,
+        code: QUOTA_ERROR_CODE,
+      },
+      { status: 402 }
+    );
+  }
 
   // Prisma client types may lag until you run `prisma generate` after schema changes.
   // We keep runtime behavior correct and relax TS here.
@@ -193,6 +217,21 @@ export async function POST(req: Request) {
       },
       { status: 502 }
     );
+  }
+
+  if (user) {
+    const consumed = await consumeResumeGeneration(
+      user.id,
+      user.plan,
+      user.stripeSubscriptionStatus
+    );
+    if (!consumed.ok) {
+      console.error(
+        "Resume generation succeeded but quota increment failed after webhook",
+        userId,
+        consumed
+      );
+    }
   }
 
   console.log("=== RESUME GENERATION SUCCESS ===");

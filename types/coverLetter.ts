@@ -38,5 +38,6 @@ export interface CoverLetterGenerationResponse {
   job?: CoverLetterJob;
   user?: CoverLetterUser;
   error?: string;
+  code?: string;
   webhookResponse?: unknown;
 }

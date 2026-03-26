@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import {
+  checkFreeTierUpload,
+  countDocumentRowsForUser,
+  QUOTA_ERROR_CODE,
+} from "@/lib/billing/limits";
 import { prisma } from "@/lib/prisma";
 import {
   extractTextFromUpload,
@@ -33,7 +38,13 @@ export async function POST(req: Request) {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, name: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      plan: true,
+      stripeSubscriptionStatus: true,
+    },
   });
 
   const form = await req.formData();
@@ -44,6 +55,20 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: "Please upload at least one PDF or DOCX file." },
       { status: 400 }
+    );
+  }
+
+  const docRows = await countDocumentRowsForUser(userId);
+  const uploadCheck = checkFreeTierUpload(
+    user?.plan ?? "free",
+    user?.stripeSubscriptionStatus ?? null,
+    docRows,
+    files.length
+  );
+  if (!uploadCheck.ok) {
+    return NextResponse.json(
+      { error: uploadCheck.message, code: uploadCheck.code },
+      { status: 402 }
     );
   }
 

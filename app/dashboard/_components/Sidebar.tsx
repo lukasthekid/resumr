@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   Briefcase,
+  CreditCard,
   Settings,
   LogOut,
   PanelLeftClose,
@@ -157,6 +158,12 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
             href="/dashboard/applications"
             icon={Briefcase}
             label="Applications"
+            expanded={expanded}
+          />
+          <NavLink
+            href="/dashboard/billing"
+            icon={CreditCard}
+            label="Billing"
             expanded={expanded}
           />
           <NavLink

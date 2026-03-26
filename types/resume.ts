@@ -310,6 +310,7 @@ export interface ResumeGenerationResponse {
   user?: ResumeUser;
   job?: ResumeJob;
   error?: string;
+  code?: string;
   webhookResponse?: unknown;
 }
 

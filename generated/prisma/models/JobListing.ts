@@ -496,14 +496,6 @@ export type JobListingScalarRelationFilter = {
   isNot?: Prisma.JobListingWhereInput
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type JobListingCreateNestedOneWithoutApplicationsInput = {
   create?: Prisma.XOR<Prisma.JobListingCreateWithoutApplicationsInput, Prisma.JobListingUncheckedCreateWithoutApplicationsInput>
   connectOrCreate?: Prisma.JobListingCreateOrConnectWithoutApplicationsInput

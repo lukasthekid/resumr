@@ -7,6 +7,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum PlanTier {
+  free
+  pro
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -23,6 +28,16 @@ model User {
   postcode      String?
   country       String?
   linkedInUrl   String?
+
+  // Billing (Stripe)
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripeSubscriptionStatus String?
+  plan                   PlanTier  @default(free)
+
+  // Free-tier lifetime AI usage (not incremented for Pro)
+  resumeGenerationsUsed       Int @default(0)
+  coverLetterGenerationsUsed  Int @default(0)
 
   accounts      Account[]
   sessions      Session[]

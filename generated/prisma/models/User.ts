@@ -20,8 +20,20 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  resumeGenerationsUsed: number | null
+  coverLetterGenerationsUsed: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  resumeGenerationsUsed: number | null
+  coverLetterGenerationsUsed: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -38,6 +50,12 @@ export type UserMinAggregateOutputType = {
   postcode: string | null
   country: string | null
   linkedInUrl: string | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  stripeSubscriptionStatus: string | null
+  plan: $Enums.PlanTier | null
+  resumeGenerationsUsed: number | null
+  coverLetterGenerationsUsed: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +74,12 @@ export type UserMaxAggregateOutputType = {
   postcode: string | null
   country: string | null
   linkedInUrl: string | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  stripeSubscriptionStatus: string | null
+  plan: $Enums.PlanTier | null
+  resumeGenerationsUsed: number | null
+  coverLetterGenerationsUsed: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -74,11 +98,27 @@ export type UserCountAggregateOutputType = {
   postcode: number
   country: number
   linkedInUrl: number
+  stripeCustomerId: number
+  stripeSubscriptionId: number
+  stripeSubscriptionStatus: number
+  plan: number
+  resumeGenerationsUsed: number
+  coverLetterGenerationsUsed: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  resumeGenerationsUsed?: true
+  coverLetterGenerationsUsed?: true
+}
+
+export type UserSumAggregateInputType = {
+  resumeGenerationsUsed?: true
+  coverLetterGenerationsUsed?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -94,6 +134,12 @@ export type UserMinAggregateInputType = {
   postcode?: true
   country?: true
   linkedInUrl?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  stripeSubscriptionStatus?: true
+  plan?: true
+  resumeGenerationsUsed?: true
+  coverLetterGenerationsUsed?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -112,6 +158,12 @@ export type UserMaxAggregateInputType = {
   postcode?: true
   country?: true
   linkedInUrl?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  stripeSubscriptionStatus?: true
+  plan?: true
+  resumeGenerationsUsed?: true
+  coverLetterGenerationsUsed?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +182,12 @@ export type UserCountAggregateInputType = {
   postcode?: true
   country?: true
   linkedInUrl?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  stripeSubscriptionStatus?: true
+  plan?: true
+  resumeGenerationsUsed?: true
+  coverLetterGenerationsUsed?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -173,6 +231,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -203,6 +273,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -221,9 +293,17 @@ export type UserGroupByOutputType = {
   postcode: string | null
   country: string | null
   linkedInUrl: string | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  stripeSubscriptionStatus: string | null
+  plan: $Enums.PlanTier
+  resumeGenerationsUsed: number
+  coverLetterGenerationsUsed: number
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -260,6 +340,12 @@ export type UserWhereInput = {
   postcode?: Prisma.StringNullableFilter<"User"> | string | null
   country?: Prisma.StringNullableFilter<"User"> | string | null
   linkedInUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubscriptionStatus?: Prisma.StringNullableFilter<"User"> | string | null
+  plan?: Prisma.EnumPlanTierFilter<"User"> | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFilter<"User"> | number
+  coverLetterGenerationsUsed?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
@@ -281,6 +367,12 @@ export type UserOrderByWithRelationInput = {
   postcode?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   linkedInUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
@@ -291,6 +383,8 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  stripeCustomerId?: string
+  stripeSubscriptionId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -305,12 +399,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   postcode?: Prisma.StringNullableFilter<"User"> | string | null
   country?: Prisma.StringNullableFilter<"User"> | string | null
   linkedInUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubscriptionStatus?: Prisma.StringNullableFilter<"User"> | string | null
+  plan?: Prisma.EnumPlanTierFilter<"User"> | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFilter<"User"> | number
+  coverLetterGenerationsUsed?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   applications?: Prisma.JobApplicationListRelationFilter
-}, "id" | "email">
+}, "id" | "email" | "stripeCustomerId" | "stripeSubscriptionId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -326,11 +424,19 @@ export type UserOrderByWithAggregationInput = {
   postcode?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   linkedInUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -350,6 +456,12 @@ export type UserScalarWhereWithAggregatesInput = {
   postcode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   country?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   linkedInUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripeSubscriptionStatus?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  plan?: Prisma.EnumPlanTierWithAggregatesFilter<"User"> | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntWithAggregatesFilter<"User"> | number
+  coverLetterGenerationsUsed?: Prisma.IntWithAggregatesFilter<"User"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -368,6 +480,12 @@ export type UserCreateInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -389,6 +507,12 @@ export type UserUncheckedCreateInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -410,6 +534,12 @@ export type UserUpdateInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -431,6 +561,12 @@ export type UserUncheckedUpdateInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -452,6 +588,12 @@ export type UserCreateManyInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -470,6 +612,12 @@ export type UserUpdateManyMutationInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -488,6 +636,12 @@ export type UserUncheckedUpdateManyInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -506,8 +660,19 @@ export type UserCountOrderByAggregateInput = {
   postcode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   linkedInUrl?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  stripeSubscriptionStatus?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -524,6 +689,12 @@ export type UserMaxOrderByAggregateInput = {
   postcode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   linkedInUrl?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  stripeSubscriptionStatus?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -542,8 +713,19 @@ export type UserMinOrderByAggregateInput = {
   postcode?: Prisma.SortOrder
   country?: Prisma.SortOrder
   linkedInUrl?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  stripeSubscriptionStatus?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  resumeGenerationsUsed?: Prisma.SortOrder
+  coverLetterGenerationsUsed?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -565,6 +747,18 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type NullableBytesFieldUpdateOperationsInput = {
   set?: runtime.Bytes | null
+}
+
+export type EnumPlanTierFieldUpdateOperationsInput = {
+  set?: $Enums.PlanTier
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -627,6 +821,12 @@ export type UserCreateWithoutApplicationsInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -647,6 +847,12 @@ export type UserUncheckedCreateWithoutApplicationsInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -683,6 +889,12 @@ export type UserUpdateWithoutApplicationsInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -703,6 +915,12 @@ export type UserUncheckedUpdateWithoutApplicationsInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -723,6 +941,12 @@ export type UserCreateWithoutAccountsInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -743,6 +967,12 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -779,6 +1009,12 @@ export type UserUpdateWithoutAccountsInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -799,6 +1035,12 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -819,6 +1061,12 @@ export type UserCreateWithoutSessionsInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -839,6 +1087,12 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   postcode?: string | null
   country?: string | null
   linkedInUrl?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeSubscriptionStatus?: string | null
+  plan?: $Enums.PlanTier
+  resumeGenerationsUsed?: number
+  coverLetterGenerationsUsed?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -875,6 +1129,12 @@ export type UserUpdateWithoutSessionsInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -895,6 +1155,12 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   postcode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.EnumPlanTierFieldUpdateOperationsInput | $Enums.PlanTier
+  resumeGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  coverLetterGenerationsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -964,6 +1230,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   postcode?: boolean
   country?: boolean
   linkedInUrl?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  stripeSubscriptionStatus?: boolean
+  plan?: boolean
+  resumeGenerationsUsed?: boolean
+  coverLetterGenerationsUsed?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -986,6 +1258,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   postcode?: boolean
   country?: boolean
   linkedInUrl?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  stripeSubscriptionStatus?: boolean
+  plan?: boolean
+  resumeGenerationsUsed?: boolean
+  coverLetterGenerationsUsed?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1004,6 +1282,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   postcode?: boolean
   country?: boolean
   linkedInUrl?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  stripeSubscriptionStatus?: boolean
+  plan?: boolean
+  resumeGenerationsUsed?: boolean
+  coverLetterGenerationsUsed?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1022,11 +1306,17 @@ export type UserSelectScalar = {
   postcode?: boolean
   country?: boolean
   linkedInUrl?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  stripeSubscriptionStatus?: boolean
+  plan?: boolean
+  resumeGenerationsUsed?: boolean
+  coverLetterGenerationsUsed?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "headshot" | "passwordHash" | "phoneNumber" | "streetAddress" | "city" | "postcode" | "country" | "linkedInUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "headshot" | "passwordHash" | "phoneNumber" | "streetAddress" | "city" | "postcode" | "country" | "linkedInUrl" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeSubscriptionStatus" | "plan" | "resumeGenerationsUsed" | "coverLetterGenerationsUsed" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
@@ -1057,6 +1347,12 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     postcode: string | null
     country: string | null
     linkedInUrl: string | null
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    stripeSubscriptionStatus: string | null
+    plan: $Enums.PlanTier
+    resumeGenerationsUsed: number
+    coverLetterGenerationsUsed: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1498,6 +1794,12 @@ export interface UserFieldRefs {
   readonly postcode: Prisma.FieldRef<"User", 'String'>
   readonly country: Prisma.FieldRef<"User", 'String'>
   readonly linkedInUrl: Prisma.FieldRef<"User", 'String'>
+  readonly stripeCustomerId: Prisma.FieldRef<"User", 'String'>
+  readonly stripeSubscriptionId: Prisma.FieldRef<"User", 'String'>
+  readonly stripeSubscriptionStatus: Prisma.FieldRef<"User", 'String'>
+  readonly plan: Prisma.FieldRef<"User", 'PlanTier'>
+  readonly resumeGenerationsUsed: Prisma.FieldRef<"User", 'Int'>
+  readonly coverLetterGenerationsUsed: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

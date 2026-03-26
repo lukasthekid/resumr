@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
 import { GenerationProcessingView } from "./GenerationProcessingView";
@@ -75,12 +76,20 @@ export function ResumeGenerator({ jobId }: { jobId: number }) {
       }
 
       setResult(
-        json ??
-          ({
-            ok: false,
-            webhookStatus: res.status,
-            error: `Generation failed (HTTP ${res.status}).`,
-          } satisfies ResumeGenerationResponse)
+        json
+          ? {
+              ...json,
+              ok: json.ok ?? false,
+              webhookStatus: json.webhookStatus ?? res.status,
+              error:
+                json.error ??
+                (res.ok ? undefined : `Generation failed (HTTP ${res.status}).`),
+            }
+          : {
+              ok: false,
+              webhookStatus: res.status,
+              error: `Generation failed (HTTP ${res.status}).`,
+            }
       );
     } catch (e) {
       setResult({
@@ -155,6 +164,14 @@ export function ResumeGenerator({ jobId }: { jobId: number }) {
       {result?.error && (
         <div className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-4">
           <div className="text-sm text-rose-700">{result.error}</div>
+          {result.code === "QUOTA_EXCEEDED" && (
+            <Link
+              href="/dashboard/billing"
+              className="mt-2 inline-block text-sm font-semibold text-indigo-700 hover:underline"
+            >
+              View billing
+            </Link>
+          )}
           {result.webhookResponse != null && (
             <pre className="mt-2 max-h-96 overflow-auto rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-700">
               {typeof result.webhookResponse === "string"

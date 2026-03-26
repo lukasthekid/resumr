@@ -6,9 +6,21 @@ import { CheckCircle2, Settings, Zap } from "lucide-react";
 interface ProfileSnapshotProps {
   hasDocuments: boolean;
   hasProfile: boolean;
+  isPro: boolean;
+  resumeRemaining: number | null;
+  coverRemaining: number | null;
+  /** Free tier: true when a resume file is already stored (must delete to replace). */
+  uploadSlotInUse: boolean;
 }
 
-export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotProps) {
+export function ProfileSnapshot({
+  hasDocuments,
+  hasProfile,
+  isPro,
+  resumeRemaining,
+  coverRemaining,
+  uploadSlotInUse,
+}: ProfileSnapshotProps) {
   const allReady = hasDocuments && hasProfile;
 
   return (
@@ -98,32 +110,67 @@ export function ProfileSnapshot({ hasDocuments, hasProfile }: ProfileSnapshotPro
           </div>
           <div className="flex-1">
             <h3 className="text-sm font-bold text-foreground mb-1">
-              AI Generations
+              Plan usage
             </h3>
             <p className="text-xs text-foreground-muted">
-              Track your document generations
+              {isPro ? "Pro — unlimited AI generations" : "Starter — limited generations"}
             </p>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-end justify-between">
-            <span className="text-2xl font-bold text-foreground">∞</span>
-            <span className="text-xs font-medium text-foreground-muted">Unlimited</span>
-          </div>
-          <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-            <div className="bg-gradient-to-r from-primary to-secondary h-full rounded-full" style={{ width: '100%' }} />
-          </div>
-          <p className="text-xs text-foreground-subtle">
-            Free Plan - No limits while in beta
+        {isPro ? (
+          <p className="text-sm text-foreground font-medium">
+            Unlimited resume and cover letter generations. Unlimited resume files in context.
           </p>
-        </div>
+        ) : (
+          <ul className="space-y-2 text-sm text-foreground">
+            <li className="flex justify-between gap-2">
+              <span className="text-foreground-muted">Resume generations</span>
+              <span className="font-semibold tabular-nums">
+                {resumeRemaining ?? 0} left
+              </span>
+            </li>
+            <li className="flex justify-between gap-2">
+              <span className="text-foreground-muted">Cover letters</span>
+              <span className="font-semibold tabular-nums">
+                {coverRemaining ?? 0} left
+              </span>
+            </li>
+            <li className="flex justify-between gap-2">
+              <span className="text-foreground-muted">Resume file slot</span>
+              <span className="font-semibold text-right">
+                {uploadSlotInUse ? (
+                  <>
+                    In use —{" "}
+                    <Link
+                      href="/dashboard/settings"
+                      className="text-primary font-semibold hover:underline"
+                    >
+                      delete to replace
+                    </Link>
+                  </>
+                ) : (
+                  "Free"
+                )}
+              </span>
+            </li>
+          </ul>
+        )}
+
+        {!isPro && (
+          <Link
+            href="/dashboard/billing"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover transition-colors"
+          >
+            Upgrade to Pro
+          </Link>
+        )}
       </div>
 
       {/* Tips Card */}
       <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-5">
         <h3 className="text-sm font-bold text-foreground mb-2">
-          💡 Pro Tips
+          Pro tips
         </h3>
         <ul className="space-y-2 text-xs text-foreground-muted">
           <li className="flex items-start gap-2">

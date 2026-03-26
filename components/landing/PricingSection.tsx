@@ -14,7 +14,7 @@ const plans = [
     features: [
       { text: "3 Cover Letter Generations", included: true },
       { text: "3 Resume Generations", included: true },
-      { text: "1 Resume Upload for Context", included: true },
+      { text: "1 resume file in context at a time (delete to replace)", included: true },
       { text: "Job Tracking Board", included: true },
       { text: "Priority Support", included: false },
     ],
@@ -37,10 +37,10 @@ const plans = [
       { text: "Job Tracking Board", included: true },
       { text: "Priority Support", included: true },
     ],
-    footnote: "Credit card required. Cancel anytime, monthly.",
+    footnote: "Credit card required. Cancel anytime.",
     buttonText: "Get Unlimited Access",
     buttonVariant: "primary" as const,
-    href: "/login",
+    href: "/login?callbackUrl=/dashboard/billing",
   },
 ];
 

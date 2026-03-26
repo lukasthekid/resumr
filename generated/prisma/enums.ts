@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const PlanTier = {
+  free: 'free',
+  pro: 'pro'
+} as const
+
+export type PlanTier = (typeof PlanTier)[keyof typeof PlanTier]
+
+
 export const ApplicationStage = {
   applied: 'applied',
   interviewing: 'interviewing',

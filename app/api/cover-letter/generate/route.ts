@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import {
+  consumeCoverLetterGeneration,
+  FREE_COVER_CAP,
+  hasProAccess,
+  QUOTA_ERROR_CODE,
+} from "@/lib/billing/limits";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -90,8 +96,26 @@ export async function POST(req: Request) {
       linkedInUrl: true,
       createdAt: true,
       updatedAt: true,
+      plan: true,
+      stripeSubscriptionStatus: true,
+      coverLetterGenerationsUsed: true,
     },
   });
+
+  if (
+    user &&
+    !hasProAccess(user.plan, user.stripeSubscriptionStatus) &&
+    user.coverLetterGenerationsUsed >= FREE_COVER_CAP
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: `Free plan includes ${FREE_COVER_CAP} cover letter generations. Upgrade to Pro for unlimited.`,
+        code: QUOTA_ERROR_CODE,
+      },
+      { status: 402 }
+    );
+  }
 
   // Prisma client types may lag until you run `prisma generate` after schema changes.
   // We keep runtime behavior correct and relax TS here.
@@ -163,6 +187,32 @@ export async function POST(req: Request) {
   }
 
   const coverLetterText = pickCoverLetterText(parsed ?? text);
+
+  if (!coverLetterText) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Cover letter text missing from response.",
+        webhookResponse: parsed ?? text,
+      },
+      { status: 502 }
+    );
+  }
+
+  if (user) {
+    const consumed = await consumeCoverLetterGeneration(
+      user.id,
+      user.plan,
+      user.stripeSubscriptionStatus
+    );
+    if (!consumed.ok) {
+      console.error(
+        "Cover letter generation succeeded but quota increment failed after webhook",
+        userId,
+        consumed
+      );
+    }
+  }
 
   return NextResponse.json({
     ok: true,

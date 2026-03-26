@@ -89,6 +89,12 @@ export const UserScalarFieldEnum = {
   postcode: 'postcode',
   country: 'country',
   linkedInUrl: 'linkedInUrl',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  stripeSubscriptionStatus: 'stripeSubscriptionStatus',
+  plan: 'plan',
+  resumeGenerationsUsed: 'resumeGenerationsUsed',
+  coverLetterGenerationsUsed: 'coverLetterGenerationsUsed',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

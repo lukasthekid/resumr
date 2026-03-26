@@ -1,4 +1,9 @@
 import { auth } from "@/auth";
+import {
+  hasProAccess,
+  remainingCoverLetterGenerations,
+  remainingResumeGenerations,
+} from "@/lib/billing/limits";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ImportJobForm } from "./_components/ImportJobForm";
@@ -29,6 +34,10 @@ export default async function DashboardHome() {
       postcode: true,
       country: true,
       linkedInUrl: true,
+      plan: true,
+      stripeSubscriptionStatus: true,
+      resumeGenerationsUsed: true,
+      coverLetterGenerationsUsed: true,
     },
   });
 
@@ -40,6 +49,25 @@ export default async function DashboardHome() {
     WHERE metadata->>'user_id' = ${String(userId)}
   `;
   const documentCount = Number(countRows[0]?.count ?? 0);
+
+  const isPro = user
+    ? hasProAccess(user.plan, user.stripeSubscriptionStatus)
+    : false;
+  const resumeRemaining = user
+    ? remainingResumeGenerations(
+        user.plan,
+        user.stripeSubscriptionStatus,
+        user.resumeGenerationsUsed
+      )
+    : null;
+  const coverRemaining = user
+    ? remainingCoverLetterGenerations(
+        user.plan,
+        user.stripeSubscriptionStatus,
+        user.coverLetterGenerationsUsed
+      )
+    : null;
+  const uploadSlotInUse = !isPro && documentCount > 0;
 
   // If no documents, show onboarding hero
   if (documentCount === 0) {
@@ -404,7 +432,14 @@ export default async function DashboardHome() {
 
         {/* Right Column (col-span-1) - Profile Snapshot */}
         <div className="lg:col-span-1">
-          <ProfileSnapshot hasDocuments={documentCount > 0} hasProfile={hasProfile} />
+          <ProfileSnapshot
+            hasDocuments={documentCount > 0}
+            hasProfile={hasProfile}
+            isPro={isPro}
+            resumeRemaining={resumeRemaining}
+            coverRemaining={coverRemaining}
+            uploadSlotInUse={uploadSlotInUse}
+          />
         </div>
       </div>
     </div>
