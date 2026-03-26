@@ -26,7 +26,7 @@ const plans = [
   {
     name: "Pro",
     price: "4€",
-    period: "/ week",
+    period: "week",
     description: "Unlimited applications, documents, and support — apply without limits.",
     popular: true,
     badge: "Most Popular",
