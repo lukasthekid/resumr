@@ -6,8 +6,20 @@ import { prisma } from "@/lib/prisma";
 
 type RequestBody = {
   resumeData: ResumeData;
-  layout?: "modern" | "classic" | "dach";
+  layout?: "modern" | "classic" | "dach" | "european";
 };
+
+async function getHeadshotBase64FromSession(): Promise<string | null> {
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  if (!userId || typeof userId !== "string") return null;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { headshot: true },
+  });
+  if (!user?.headshot || user.headshot.length === 0) return null;
+  return Buffer.from(user.headshot).toString("base64");
+}
 
 function generateModernResumeHTML(resumeData: ResumeData): string {
   const { personal, education, workExperience, projects, skills } = resumeData;
@@ -1094,6 +1106,261 @@ function generateDACHResumeHTML(
   `;
 }
 
+const EU_ACCENT = "#1e293b";
+const EU_EXCLUDE_SKILLS = ["spokenLanguages", "hobbies"];
+
+function generateEuropeanResumeHTML(
+  resumeData: ResumeData,
+  headshotBase64?: string | null
+): string {
+  const { personal, education, workExperience, projects, skills } = resumeData;
+
+  const formatUrl = (url: string): string => {
+    if (!url) return "";
+    return url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+  };
+
+  const currentRole = workExperience?.[0]?.title || "";
+  const mainSkills = skills
+    ? Object.entries(skills).filter(
+        ([cat]) => !EU_EXCLUDE_SKILLS.includes(cat) && skills[cat]?.length
+      )
+    : [];
+  const spokenLanguages = skills?.spokenLanguages || [];
+  const hobbies = skills?.hobbies || [];
+
+  const headshotImg = headshotBase64
+    ? `<img src="data:image/jpeg;base64,${headshotBase64}" alt="" class="eu-headshot-img" />`
+    : "";
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          @page { size: A4; margin: 0; }
+          body {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            padding: 8mm 10mm;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.3;
+            color: #111827;
+            background: white;
+          }
+          .eu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1em;
+            margin-bottom: 1em;
+            padding-bottom: 0.75em;
+            border-bottom: 1px solid ${EU_ACCENT};
+          }
+          .eu-header-text { flex: 1; min-width: 0; }
+          .eu-role { font-size: 7pt; color: #64748b; margin-bottom: 0.2em; }
+          .eu-name { font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 0.4em; }
+          .eu-contact { font-size: 7pt; color: #374151; display: flex; flex-direction: column; gap: 0.2em; }
+          .eu-contact span { display: flex; align-items: center; gap: 0.4em; }
+          .eu-contact .eu-icon { width: 10px; height: 10px; flex-shrink: 0; display: inline-block; vertical-align: middle; }
+          .eu-contact .eu-icon svg { width: 100%; height: 100%; stroke: ${EU_ACCENT}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+          .eu-headshot-wrap { flex-shrink: 0; }
+          .eu-headshot-box {
+            width: 96px;
+            height: 96px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            background: #e2e8f0;
+          }
+          .eu-headshot-img { width: 100%; height: 100%; object-fit: cover; }
+          .eu-grid { display: grid; grid-template-columns: 32% 68%; gap: 1em; }
+          .eu-sidebar { padding-right: 0.5em; }
+          .eu-main { padding-left: 0.5em; }
+          .eu-h2 {
+            font-size: 7pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 2px solid ${EU_ACCENT};
+            padding-bottom: 0.15em;
+            margin-bottom: 0.6em;
+            color: #0f172a;
+          }
+          .eu-exp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75em;
+            margin-bottom: 0.7em;
+          }
+          .eu-exp-content { flex: 1; min-width: 0; }
+          .eu-exp-title { font-weight: 700; font-size: 9pt; color: #111827; }
+          .eu-exp-company { font-size: 8pt; color: #64748b; }
+          .eu-exp-dates { flex-shrink: 0; width: 5em; text-align: right; font-size: 7pt; color: #64748b; }
+          .eu-exp-ul { margin-top: 0.3em; padding-left: 1em; list-style-type: disc; }
+          .eu-exp-ul li { margin-bottom: 0.15em; font-size: 8pt; color: #374151; line-height: 1.35; }
+          .eu-edu-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75em;
+            margin-bottom: 0.7em;
+          }
+          .eu-edu-content { flex: 1; min-width: 0; }
+          .eu-edu-inst { font-weight: 700; font-size: 9pt; color: #111827; }
+          .eu-edu-degree { font-size: 8pt; font-style: italic; color: #374151; }
+          .eu-edu-dates { flex-shrink: 0; width: 5em; text-align: right; font-size: 7pt; color: #64748b; }
+          .eu-edu-ul { margin-top: 0.3em; padding-left: 1em; list-style-type: disc; }
+          .eu-edu-ul li { margin-bottom: 0.15em; font-size: 8pt; color: #374151; }
+          .eu-project { margin-bottom: 0.6em; }
+          .eu-project-name { font-weight: 600; font-size: 9pt; color: #111827; }
+          .eu-project-role { font-size: 8pt; font-style: italic; color: #64748b; }
+          .eu-project-url { font-size: 7pt; color: #2563eb; margin-top: 0.15em; }
+          .eu-project-ul { margin-top: 0.25em; padding-left: 1em; list-style-type: disc; }
+          .eu-project-ul li { margin-bottom: 0.1em; font-size: 8pt; color: #374151; }
+          .eu-skill-ul { list-style: none; padding: 0; margin: 0; }
+          .eu-skill-ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4em;
+            margin-bottom: 0.25em;
+            font-size: 8pt;
+            color: #374151;
+          }
+          .eu-skill-ul li::before {
+            content: "";
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: ${EU_ACCENT};
+            flex-shrink: 0;
+            margin-top: 0.35em;
+          }
+          section { margin-bottom: 1em; }
+          strong, b { font-weight: 600; }
+          em, i { font-style: italic; }
+          u { text-decoration: underline; }
+        </style>
+      </head>
+      <body>
+        <header class="eu-header">
+          <div class="eu-header-text">
+            ${currentRole ? `<div class="eu-role">${currentRole}</div>` : ""}
+            <h1 class="eu-name">${personal?.name || "YOUR NAME"}</h1>
+            <div class="eu-contact">
+              ${personal?.phone ? `<span><span class="eu-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span> ${personal.phone}</span>` : ""}
+              ${personal?.email ? `<span><span class="eu-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg></span> ${personal.email}</span>` : ""}
+              ${personal?.location ? `<span><span class="eu-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span> ${personal.location}</span>` : ""}
+              ${personal?.linkedin ? `<span><span class="eu-icon"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span> ${formatUrl(personal.linkedin)}</span>` : ""}
+            </div>
+          </div>
+          <div class="eu-headshot-wrap">
+            <div class="eu-headshot-box">
+              ${headshotImg || '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:7pt;color:#94a3b8;">Photo</div>'}
+            </div>
+          </div>
+        </header>
+
+        <div class="eu-grid">
+          <aside class="eu-sidebar">
+            ${mainSkills.length > 0 ? `
+              <section>
+                <h2 class="eu-h2">Skills</h2>
+                <ul class="eu-skill-ul">
+                  ${mainSkills.flatMap(([, items]) => (items || []).map((item) => `<li>${item}</li>`)).join("")}
+                </ul>
+              </section>
+            ` : ""}
+
+            ${spokenLanguages.length > 0 ? `
+              <section>
+                <h2 class="eu-h2">Languages</h2>
+                <ul class="eu-skill-ul">
+                  ${spokenLanguages.map((l) => `<li>${l}</li>`).join("")}
+                </ul>
+              </section>
+            ` : ""}
+
+            ${hobbies.length > 0 ? `
+              <section>
+                <h2 class="eu-h2">Interests</h2>
+                <ul class="eu-skill-ul">
+                  ${hobbies.map((h) => `<li>${h}</li>`).join("")}
+                </ul>
+              </section>
+            ` : ""}
+          </aside>
+
+          <main class="eu-main">
+            ${workExperience && workExperience.length > 0 ? `
+              <section>
+                <h2 class="eu-h2">Work experience</h2>
+                ${workExperience.map((exp) => `
+                  <div class="eu-exp-row">
+                    <div class="eu-exp-content">
+                      <div class="eu-exp-title">${exp.title || ""}</div>
+                      <div class="eu-exp-company">${exp.company || ""}</div>
+                      ${exp.achievements && exp.achievements.length > 0 ? `
+                        <ul class="eu-exp-ul">
+                          ${exp.achievements.map((a) => `<li>${a}</li>`).join("")}
+                        </ul>
+                      ` : ""}
+                    </div>
+                    <div class="eu-exp-dates">${exp.startDate || ""} – ${exp.endDate || "Present"}</div>
+                  </div>
+                `).join("")}
+              </section>
+            ` : ""}
+
+            ${education && education.length > 0 ? `
+              <section>
+                <h2 class="eu-h2">Education</h2>
+                ${education.map((edu) => `
+                  <div class="eu-edu-row">
+                    <div class="eu-edu-content">
+                      <div class="eu-edu-inst">${edu.institution || ""}</div>
+                      ${edu.degree ? `<div class="eu-edu-degree">${edu.degree}</div>` : ""}
+                      ${edu.highlights && edu.highlights.length > 0 ? `
+                        <ul class="eu-edu-ul">
+                          ${edu.highlights.map((h) => `<li>${h}</li>`).join("")}
+                        </ul>
+                      ` : ""}
+                    </div>
+                    <div class="eu-edu-dates">${edu.startDate || ""} – ${edu.endDate || ""}</div>
+                  </div>
+                `).join("")}
+              </section>
+            ` : ""}
+
+            ${projects && projects.length > 0 ? `
+              <section>
+                <h2 class="eu-h2">Projects</h2>
+                ${projects.map((p) => `
+                  <div class="eu-project">
+                    <div class="eu-project-name">${p.name || ""}</div>
+                    ${p.role ? `<div class="eu-project-role">${p.role}</div>` : ""}
+                    ${p.url ? `<div class="eu-project-url">${formatUrl(p.url)}</div>` : ""}
+                    ${p.description && p.description.length > 0 ? `
+                      <ul class="eu-project-ul">
+                        ${p.description.map((d) => `<li>${d}</li>`).join("")}
+                      </ul>
+                    ` : ""}
+                  </div>
+                `).join("")}
+              </section>
+            ` : ""}
+          </main>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body: RequestBody = await req.json();
@@ -1108,19 +1375,11 @@ export async function POST(req: NextRequest) {
 
     let html: string;
     if (layout === "dach") {
-      let headshotBase64: string | null = null;
-      const session = await auth();
-      const userId = (session?.user as { id?: string } | undefined)?.id;
-      if (userId && typeof userId === "string") {
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { headshot: true },
-        });
-        if (user?.headshot && user.headshot.length > 0) {
-          headshotBase64 = Buffer.from(user.headshot).toString("base64");
-        }
-      }
+      const headshotBase64 = await getHeadshotBase64FromSession();
       html = generateDACHResumeHTML(resumeData, headshotBase64);
+    } else if (layout === "european") {
+      const headshotBase64 = await getHeadshotBase64FromSession();
+      html = generateEuropeanResumeHTML(resumeData, headshotBase64);
     } else if (layout === "classic") {
       html = generateClassicResumeHTML(resumeData);
     } else {

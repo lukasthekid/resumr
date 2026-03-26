@@ -7,6 +7,7 @@ import { A4Page } from "@/components/resume";
 import { ModernTemplate } from "./ModernTemplate";
 import { ClassicTemplate } from "./ClassicTemplate";
 import { DACHTemplate } from "./DACHTemplate";
+import { EuropeanTemplate } from "./EuropeanTemplate";
 import { useResumeStore } from "@/store";
 import type { ResumeData } from "@/types/resume";
 
@@ -123,7 +124,7 @@ export default function ResumeViewerPage() {
 
   const [loading, setLoading] = useState(true);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
-  const [layout, setLayout] = useState<"modern" | "classic" | "dach">("modern");
+  const [layout, setLayout] = useState<"modern" | "classic" | "dach" | "european">("modern");
 
   // Get store actions
   const setResumeData = useResumeStore((state) => state.setResumeData);
@@ -238,12 +239,15 @@ export default function ResumeViewerPage() {
                 <label className="text-xs text-slate-600 font-medium">Layout:</label>
                 <select
                   value={layout}
-                  onChange={(e) => setLayout(e.target.value as "modern" | "classic" | "dach")}
+                  onChange={(e) =>
+                    setLayout(e.target.value as "modern" | "classic" | "dach" | "european")
+                  }
                   className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-700 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 >
                   <option value="modern">Two Column</option>
                   <option value="classic">Tech</option>
                   <option value="dach">DACH</option>
+                  <option value="european">European (photo)</option>
                 </select>
               </div>
 
@@ -332,6 +336,8 @@ export default function ResumeViewerPage() {
               <ModernTemplate />
             ) : layout === "dach" ? (
               <DACHTemplate />
+            ) : layout === "european" ? (
+              <EuropeanTemplate />
             ) : (
               <ClassicTemplate />
             )}
